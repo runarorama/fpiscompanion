@@ -68,6 +68,7 @@ category theory.
 def compose[A,B,C](f: B => C, g: A => B): A => C =
   a => f(g(a))
 ```
+
 ## Answers to exercises for chapter 3
 
 ### Exercise 3.01
@@ -475,6 +476,7 @@ This error is an unfortunate consequence of Scala using subtyping to encode alge
 def mapViaFold[A,B](t: Tree[A])(f: A => B): Tree[B] = 
   fold(t)(a => Leaf(f(a)): Tree[B])(Branch(_,_))
 ```
+
 ## Answers to exercises for chapter 4
 
 ### Exercise 4.01
@@ -631,6 +633,7 @@ There is a type very similar to this called `Validation` in the Scalaz library. 
 It's also possible to use `Either[List[E],_]` directly to accumulate errors, using different implementations of helper functions like `map2` and `sequence`.
 */
 ```
+
 ## Answers to exercises for chapter 5
 
 ### Exercise 5.01
@@ -907,6 +910,7 @@ The implementation is just a `foldRight` that keeps the accumulated value and th
       (b2, cons(b2, p1._2))
     })._2
 ```
+
 ## Answers to exercises for chapter 6
 
 ### Exercise 6.01
@@ -1147,6 +1151,7 @@ object Candy {
 }
 
 ```
+
 ## Answers to exercises for chapter 7
 
 ### Exercise 7.01
@@ -1157,9 +1162,7 @@ object Candy {
 
 ### Exercise 7.02
 
-``` scala
-/* Keep reading - we choose a representation for `Par` later in the chapter. */
-```
+Keep reading - we choose a representation for `Par` later in the chapter.
 
 ### Exercise 7.03
 
@@ -1263,9 +1266,7 @@ Also https://gist.github.com/pchiusano/444de1f222f1ceb09596
 
 ### Exercise 7.08
 
-``` scala
 Keep reading. The issue is explained in the next paragraph.
-```
 
 ### Exercise 7.09
 
@@ -1277,9 +1278,7 @@ For a thread pool of size 2, `fork(fork(fork(x)))` will deadlock, and so on. Ano
 
 ### Exercise 7.10
 
-``` scala
 We give a fully fleshed-out solution in the `Task` data type in the code for Chapter 13.
-```
 
 ### Exercise 7.11
 
@@ -1388,11 +1387,11 @@ def joinViaFlatMap[A](a: Par[Par[A]]): Par[A] =
 def flatMapViaJoin[A,B](p: Par[A])(f: A => Par[B]): Par[B] = 
   join(map(p)(f))
 ```
+
 ## Answers to exercises for chapter 8
 
 ### Exercise 8.01
 
-``` scala
 Here are a few properties:
 
 * The sum of the empty list is 0.
@@ -1400,16 +1399,13 @@ Here are a few properties:
 * For any list, `l`, `sum(l) == sum(l.reverse)`, since addition is commutative.
 * Given a list, `List(x,y,z,p,q)`, `sum(List(x,y,z,p,q)) == sum(List(x,y)) + sum(List(z,p,q))`, since addition is associative. More generally, we can partition a list into two subsequences whose sum is equal to the sum of the overall list.
 * The sum of 1,2,3...n is `n*(n+1)/2`.
-```
 
 ### Exercise 8.02
 
-``` scala
 * The max of a single element list is equal to that element.
 * The max of a list is greater than or equal to all elements of the list.
 * The max of a list is an element of that list.
 * The max of the empty list is unspecified and should throw an error or return `None`.
-```
 
 ### Exercise 8.03
 
@@ -1604,77 +1600,9 @@ val forkProp = Prop.forAllPar(pint2)(i => equal(Par.fork(i), i)) tag "fork"
 
 ### Exercise 8.18
 
-``` scala
 * `l.takeWhile(f) ++ l.dropWhile(f) == l`
 * We want to enforce that `takeWhile` returns the _longest_ prefix whose elements satisfy the predicate. There are various ways to state this, but the general idea is that the remaining list, if non-empty, should start with an element that does _not_ satisfy the predicate.
-```
 
-### Exercise 8.20
-
-``` scala
-This is an open-ended exercise and we don't give an answer here.
-```
-
-### Exercise 8.21
-
-``` scala
--
-```
-
-### Exercise 8.22
-
-``` scala
-val forkProp = Prop.forAllPar(pint2)(i => equal(Par.fork(i), i)) tag "fork"
-```
-
-### Exercise 8.23
-
-``` scala
-* `l.takeWhile(f) ++ l.dropWhile(f) == l`
-* We want to enforce that `takeWhile` returns the _longest_ prefix whose elements satisfy the predicate. There are various ways to state this; but the general idea is that the remaining list, if non-empty, should start with an element that does _not_ satisfy the predicate.
-```
-
-### Exercise 8.24
-
-``` scala
-def genStringIntFn(g: Gen[Int]): Gen[String => Int] = 
-  g map (i => (s => i))
-```
-
-### Exercise 8.25
-
-``` scala
-The key insight is that generating a function involves transforming a generator. These generator transformers can be expressed using a type like this:
-
-  trait Cogen[-A] {
-    def sample[B](a: A, s: State[RNG,B]): State[RNG,B]
-    def exhaustive[B](a: A, s: Stream[Option[B]]): Stream[Option[B]]
-  }
-
-Given a `Cogen[A]` and a `Gen[B]`, we can create a `Gen[A => B]`, by transforming the `sample` and `exhaustive` members using the `Cogen` (you are encoraged to try writing this function):
-
-  def fn[A,B](in: Cogen[A])(out: Gen[B]): Gen[A => B]
-
-The only real requirement of a `Cogen[A]` is that it _use the information_ of the input `A` to define the transformation of the random and exhaustive streams. There are many ways to do this - it could pattern match on the `A` and use this to set the seed of the random number generator and determine a permutation of the exhaustive stream.
-```
-
-### Exercise 8.26
-
-``` scala
--
-```
-
-### Exercise 8.27
-
-``` scala
-Yes, it does!
-```
-
-### Exercise 8.28
-
-``` scala
-Read on to part 3 for an in-depth discussion of the commonalities among these different libraries and data types we have written.
-```
 ## Answers to exercises for chapter 9
 
 ### Exercise 9.01
@@ -1689,11 +1617,10 @@ def many1[A](p: Parser[A]): Parser[List[A]] =
 
 ### Exercise 9.02
 
-``` scala
 `product` is associative. These two expressions are "roughly" equal:
 
-  (a ** b) ** c
-  a ** (b ** c)
+    (a ** b) ** c
+    a ** (b ** c)
 
 The only difference is how the pairs are nested. The `(a ** b) ** c` parser returns an `((A,B), C)`, whereas the `a ** (b ** c)` returns an `(A, (B,C))`. We can define functions `unbiasL` and `unbiasR` to convert these nested tuples to flat 3-tuples:
 
@@ -1702,15 +1629,15 @@ The only difference is how the pairs are nested. The `(a ** b) ** c` parser retu
 
 With these, we can now state the associativity property:
 
-  (a ** b) ** c map (unbiasL) == a ** (b ** c) map (unbiasR)
+    (a ** b) ** c map (unbiasL) == a ** (b ** c) map (unbiasR)
 
 We'll sometimes just use `~=` when there is an obvious bijection between the two sides:
 
-  (a ** b) ** c ~= a ** (b ** c)
+    (a ** b) ** c ~= a ** (b ** c)
 
 `map` and `product` also have an interesting relationship--we can `map` either before or after taking the product of two parsers, without affecting the behavior:
 
-  a.map(f) ** b.map(g) == (a ** b) map { case (a,b) => (f(a), g(b)) }
+    a.map(f) ** b.map(g) == (a ** b) map { case (a,b) => (f(a), g(b)) }
 
 For instance, if `a` and `b` were both `Parser[String]`, and `f` and `g` both computed the length of a string, it doesn't matter if we map over the result of `a` to compute its length, or whether we do that _after_ the product.
 
@@ -1761,8 +1688,6 @@ for {
   val n = digit.toInt // we really should catch exceptions thrown by toInt and convert to parse failure
   _ <- listOfN(n, char('a'))
 } yield n
-
-
 ```
 
 ### Exercise 9.07
@@ -1782,21 +1707,15 @@ def map2[A,B,C](p: Parser[A], p2: => Parser[B])(f: (A,B) => C): Parser[C] =
 
 ``` scala
 def map[A,B](p: Parser[A])(f: A => B): Parser[B] = p.flatMap(a => succeed(f(a)))
-
 ```
 
 ### Exercise 9.09
 
-``` scala
-See full implementation in JSON.scala
-
-```
+See full implementation in JSON.scala(https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/JSON.scala).
 
 ### Exercise 9.10
 
-``` scala
 The next section works through a possible design in detail.
-```
 
 ### Exercise 9.11
 
@@ -1811,9 +1730,7 @@ def latest[A](p: Parser[A]): Parser[A]
 
 ### Exercise 9.12
 
-``` scala
 Keep reading for a discussion
-```
 
 ### Exercise 9.13
 
@@ -1924,6 +1841,7 @@ case class ParseError(stack: List[(Location,String)] = List(),
 // the furthest in the input before failing, etc
 
 ```
+
 ## Answers to exercises for chapter 10
 
 ### Exercise 10.01
@@ -2265,6 +2183,7 @@ def bag[A](as: IndexedSeq[A]): Map[A, Int] =
   foldMapV(as, mapMergeMonoid[A, Int](intAddition))((a: A) => Map(a -> 1))
 
 ```
+
 ## Answers to exercises for chapter 11
 
 ### Exercise 11.01
@@ -2663,6 +2582,7 @@ object Reader {
 // This means the Reader monad can override replicateM to provide a very efficient
 // implementation.
 ```
+
 ## Answers to exercises for chapter 12
 
 ### Exercise 12.01
@@ -2979,6 +2899,7 @@ def composeM[G[_],H[_]](implicit G: Monad[G], H: Monad[H], T: Traverse[H]):
       G.flatMap(mna)(na => G.map(T.traverse(na)(f))(H.join))
   }
 ```
+
 ## Answers to exercises for chapter 13
 
 ### Exercise 13.01
@@ -3072,6 +2993,7 @@ def composeM[G[_],H[_]](implicit G: Monad[G], H: Monad[H], T: Traverse[H]):
   // note: We can wrap `read` in `Free[Par,A]` using the `Suspend` constructor
 
 ```
+
 ## Answers to exercises for chapter 14
 
 ### Exercise 14.01
@@ -3146,6 +3068,7 @@ object STMap {
   })
 }
 ```
+
 ## Answers to exercises for chapter 15
 
 ### Exercise 15.01
