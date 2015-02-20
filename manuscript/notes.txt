@@ -44,7 +44,7 @@ We also assume some familiarity with the [factorial function](http://en.wikipedi
 
 I'd suggest that when asking for the nth fibonacci number it should be based from 1, not 0 like the current solution. i.e.
 
-~~~ scala
+``` scala
 def fib(n: Int): Int = {
     @annotation.tailrec
     def loop(n: Int, prev: Int, curr: Int): Int =
@@ -53,7 +53,7 @@ def fib(n: Int): Int = {
       
     loop(n, 0, 1)
   }
-~~~
+```
 
 ### Lambda calculus ###
 
@@ -75,7 +75,7 @@ The idea of [Currying](http://en.wikipedia.org/wiki/Currying) is named after the
 
 Function composition in functional programming is closely related to [function composition in mathematics.](http://en.wikipedia.org/wiki/Function_composition)
 
-## FAQ
+### FAQ for chapter 2
 
 #### Are tail calls optimized if the `@annotation.tailrec` annotation isn't there?
 They are still optimized, but the compiler won't warn you if it can't do the tail call optimization. 
@@ -147,19 +147,20 @@ See the [Scala Language Specification](http://www.scala-lang.org/docu/files/Scal
 Abstract Data Types](http://www.cs.utexas.edu/users/wcook/papers/OOPvsADT/CookOOPvsADT90.pdf)
 
 
-### FAQ
+### FAQ for chapter 3
 
 #### Why do you declare `Nil` as a `case object` instead of a `case class` within the definition of our functional `sealed trait List`?
 
 `case object` is more appropriate because `Nil` is a singleton. We can still use pattern matching in this case. However, there won't be a companion object with `apply`, `unapply`, etc. `case class Nil` will actually cause an error because case classes require an explicit parameter list:
 
-~~~
-<scala> case class Nil
+```
+scala> case class Nil
 <console>:1: error: case classes without a parameter list are not allowed;
 use either case objects or case classes with an explicit `()' as a parameter list.
 case class Nil
               ^
-~~~
+```
+
 ## Notes on chapter 4: Handling errors without exceptions
 
 ### Partial and total functions ###
@@ -227,12 +228,12 @@ In short, "non-strict" just means "not strict". There are many possible [evaluat
 
 In Scala, non-strict arguments are sometimes called "by name" arguments, in reference to the fact that the evaluation strategy Scala employs for those arguments is [call-by-name](http://en.wikipedia.org/wiki/Call_by_name#Call_by_name). We can turn an argument into call-by-need by caching it in a `lazy val` inside the function:
 
-~~~ scala
+``` scala
 def pairIf[A](b: Boolean, x: => A) = {
   lazy val y = x
   if (b) (y, y)
 }
-~~~
+```
 
 This function will evaluate `x` only once, or never if the boolean `b` is `false`. If we said `(x, x)` instead of `(y, y)`, it would evaluate `x` twice.
 
@@ -250,18 +251,18 @@ Ralf Hinze's paper ["Reasoning about Codata"](http://www.cs.ox.ac.uk/ralf.hinze/
 
 Non-strictness allows us to create cyclic streams such as:
 
-~~~ scala
+``` scala
 val cyclic: Stream[Int] = 0 #:: 1 #:: cyclic
-~~~
+```
 
 This may seem like it shouldn't work. The stream is referencing itself in its own tail! But the trick is that the `#::` constructor is non-strict in its second argument. The evaluation of `cyclic` will stop without expanding the expression `1 #:: cyclic`. It's not until somebody takes the `tail` of the `tail` of `cyclic` that the recursive reference is expanded, and again it expands only one element at a time, allowing for an infinite, cyclic stream.
 
 Note that the `cyclic` stream is reusing its own structure. `cyclic.tail.tail` is not a new stream that looks like `cyclic`. It really is the same object as `cyclic` in every sense:
 
-~~~
+```
 scala> cyclic.tail.tail eq cyclic
 res0: Boolean = true
-~~~
+```
 
 This technique is sometimes called "Tying the Knot". For more information see the [Haskell.org article](http://www.haskell.org/haskellwiki/Tying_the_Knot).
 
@@ -271,9 +272,9 @@ However, be careful of creating such structures using the Scala standard library
 
 Be careful using Stream.apply, both in the standard library and in the exercises: they are constructed using _repeated parameters_, which are always strict. This means that e.g.
 
-~~~scala
+```scala
 Stream({println("One"); 1}, {println("Two"); 2}, {println("Three"); 3})
-~~~ 
+``` 
 
 will immediately print One, Two, Three. Although the Stream will be constructed lazily, the contents have already been evaluated. 
 
@@ -309,9 +310,9 @@ The function `f` itself is the transition function of the machine. If we expand 
 
 Contrast this with a [Moore machine](http://en.wikipedia.org/wiki/Moore_machine), whose output is determined solely by the current state. A Moore machine could be modeled by a data type like the following:
 
-~~~ scala
+``` scala
 case class Moore[S, I, A](t: (S, I) => S, g: S => A)
-~~~
+```
 
 Together with an initial state `s` of type `S`. Here:
 
@@ -323,9 +324,9 @@ Together with an initial state `s` of type `S`. Here:
 
 As with Mealy machines, we could model the transition function and the output function as a single function:
 
-~~~ scala
+``` scala
 type Moore[S, I, A] = S => (I => S, A)
-~~~
+```
 
 Since both the transition function `t` and the output function `g` take a value of type `S`, we can take that value as a single argument and from it determine the transition function of type `I => S` as well as the output value of type `A` at the same time.
 
@@ -335,26 +336,26 @@ Mealy and Moore machines are related in a way that is interesting to explore.
 
 If we specialize `Moore` so that the input and output types are the same, we get a pair of functions `t: (S, A) => S` and `g: S => A`. We can view these as (respectively) a "getter" and a "setter" of `A` values on the type `S`:
 
-~~~
+```
 get: S => A
 set: (S, A) => S
-~~~
+```
 
 Imagine for example where `S` is `Person` and `A` is `Name`.
 
-~~~ scala
+``` scala
 type Name = String
 
 case class Person(name: Name, age: Int)
-~~~
+```
 
 A function `getName` would have the type `Person => Name`, and `setName` would have the type `(Person, Name) => Person`. In the latter case, given a `Person` and a `Name`, we can set the `name` of the `Person` and get a new `Person` with the new `name`.
 
 The getter and setter together form what's called a _lens_. A lens "focuses" on a part of a larger structure, and allows us to modify the value under focus. A simple model of lenses is:
 
-~~~ scala
+``` scala
 case class Lens[A, B](get: A => B, set: (A, B) => A)
-~~~
+```
 
 Where `A` is the larger structure, and `B` is the part of that structure that is under focus.
 
@@ -362,10 +363,10 @@ Importantly, lenses _compose_. That is, if you have a `Lens[A,B]`, and a `Lens[B
 
 Lenses are handy to use with the `State` data type. Given a `State[S,A]`. If we're interested in looking at or modifying a portion of the state, and the portion has type `T`, it can be useful to focus on a portion of the state that we're interested in using a `Lens[S,T]`. The getter and setter of a lens can be readily converted to a `State` action:
 
-~~~scala
+```scala
 def getS[S,A](l: Lens[S, A]): State[S,A] = State(s => (l.get(s), s))
 def setS[S,A](l: Lens[S, A], a: A): State[S,Unit] = State(s => (l.set(s, a), ()))
-~~~
+```
 
 We cannot, however, turn a `State` action into a `Lens`, for the same reason that we cannot convert a Moore machine into a Mealy machine.
 
@@ -379,9 +380,9 @@ The solution is to use a _trampoline_. Chapter 13 gives a detailed explanation o
 
 Using the trampolining data type `TailRec` from chapter 13, a stack-safe `State` data type could be written as follows:
 
-~~~ scala
+``` scala
 case class State[S,A](run: S => TailRec[(A, S)])
-~~~
+```
 
 This is identical to the `State` data type we present in chapter 6, except that the result type of `run` is `TailRec[(S,A)]` instead of just `(S,A)`. See chapter 13 for a thorough discussion of `TailRec`. The important part is that the _result type_ of the `State` transition function needs to be a data type like `TailRec` that gets run at a later time by a tail recursive trampoline function.
 ## Notes on chapter 7: Purely functional parallelism
@@ -398,20 +399,20 @@ This style of library isn't particularly good at expressing _pipeline parallelis
 
 We noted in this chapter that one of our laws for `Par`, sometimes called _map fusion_, can be used as an optimization:
 
-~~~ scala
+``` scala
 map(map(y)(g))(f) == map(y)(f compose g)
-~~~
+```
 
 That is, rather than spawning a separate parallel computation to compute the second mapping, we can fold it into the first mapping. We mentioned that our representation of `Par` doesn't allow for this, as it's too 'opaque'. If we make `Par` a proper data type and give it constructors that we can pattern match on, then it's easy to implement map fusion:
 
-~~~ scala
+``` scala
 trait Par[+A] {
   def map[B](f: A => B): Par[B] = this match {
     case MapPar(p, g) => MapPar(p, g andThen f)
     case _ => MapPar(
   }
 case class MapPar[A,+B](par: Par[A], f: A => B) extends Par[B]
-~~~
+```
 
 Baking ad hoc optimization rules like this into our data type works, but it can sometimes get unwieldy, and it's not very modular (we don't get to reuse code if there's some other data type needing similar optimizations). There are various ways of factoring out these sorts of optimizations so our core data type (be it `Par` or some other type) stays clean, and the optimization is handled as a separate concern. Edward Kmett has a nice [blog series discussing this approach](http://comonad.com/reader/2011/free-monads-for-less/). Before embarking on that series you'll need to be familiar with the content in part 3 of this book, and you should read [the Haskell appendix](https://github.com/pchiusano/fpinscala/wiki/A-brief-introduction-to-Haskell,-and-why-it-matters) as well.
 
@@ -423,14 +424,14 @@ The wikipedia page on [QuickCheck](http://en.wikipedia.org/wiki/QuickCheck) and 
 
 Although property-based testing works quite well for testing pure functions, it can also be used for testing imperative code. The general idea is to generate _lists of instructions_, which are then fed to an interpreter of these actions. We then check that the pre and post-conditions are as expected. Here's a simple example of testing the mutable stack implementation from Scala's standard library ([API docs](http://www.scala-lang.org/api/current/scala/collection/mutable/ArrayStack.html)):
 
-~~~ scala
+``` scala
 forAll(Gen.listOf(Gen.choose(1,10))) { l => 
   val buf = new collection.mutable.ArrayStack[Int]
   val beforeSize = buf.size 
   l.foreach(buf.push)
   buf.beforeSize == 0 && buf.size == l.size
 }
-~~~
+```
 
 In this case, the "interpreter" is the `push` method on `ArrayStack`, which modifies the stack in place, and the "instructions" are simply the integers from the input list. But the basic idea can be extended to testing richer interfaces--for instance, we could generate instructions that could either `push` or `pop` elements from an `ArrayStack` (perhaps represented as a `List[Option[Int]]`), and write a property that sequences of `push` and `pop` preserve the invariants of `ArrayStack` (for instance, the final size of the stack should be the number of `push` calls minus the number of `pop` calls). Care must be taken to craft generators that produce valid sequences of instructions (for instance, `pop` without a corresponding prior `push` is not a valid input).
 
@@ -468,18 +469,18 @@ _Handling of ambiguity and left-recursion_: The parsers developed in this chapte
 
 Related to this, the parser combinators developed here cannot directly handle _left-recursion_, for instance:
 
-~~~ scala
+``` scala
 def expr = (int or double) or (
            expr ** "+" ** expr ) or (
            "(" ** expr ** ")" )
-~~~
+```
 
 This will fail with a stack overflow error, since we will keep recursing into `expr`. The invariant that prevents this is that all branches of a parser must consume at least one character before recursing. In this example, we could do this by simply factoring the grammar a bit differently:  
 
-~~~ scala
+``` scala
 def leaf = int or double or ("(" ** expr ** ")")
 def expr = leaf.sep("+")
-~~~
+```
 
 Where `sep` is a combinator that parses a list of elements, ignoring some delimiter ("separator") that comes between each element (it can be implemented in terms of `many`). This same basic approach can be used to handle operator precedence--for instance, if `leaf` were a parser that included binary expressions involving multiplication, this would make the precedence of multiplication higher than that of addition. Of course, it is possible to write combinators to abstract out patterns like this. It is also possible to write a monolithic combinator that uses a [more efficient (but specialized) algorithm](http://en.wikipedia.org/wiki/Shunting-yard_algorithm) to build operator parsers.
 
@@ -492,12 +493,12 @@ Where `sep` is a combinator that parses a list of elements, ignoring some delimi
 
 Lastly, we mentioned that the JSON parser we wrote in this chapter was rather dumb in that it only constructed a parse tree. This is unfortunate--we will typically then have to traverse this parse tree to extract some meaningful type from the parse tree after the fact. We could instead build up whatever type we wish _as we go_. The general idea is to parameterize our grammar on functions that describe what to do at each level of the parse tree:
   
-~~~ scala
+``` scala
 def array[A,B](value: Parser[A])(f: List[A] => B): Parser[B] = 
   "[" *> value.sep(",").map(f) <* "]"
   // `*>` ignores the left parse result, in this case the `"["`, 
   // and `<*` ignores the right parse result, in this case the `"]"`.
-~~~
+```
 
 This parses a JSON array, but rather than building a `JArray`, immediately converts the result to `B` using the given function, where `B` might be some more meaningful type. The same strategy can be applied for the rest of the grammar.
 ## Notes on chapter 10: Monoids
@@ -524,9 +525,9 @@ In Scala, it's possible to have multiple `Monoid` instances associated with a ty
 
 This can lead to certain problems since we cannot count on a `Monoid` instance being _canonical_ in any way. To illustrate this problem, consider a "suspended" computation like the following:
 
-~~~ scala
+``` scala
 case class Suspended(acc: Int, m: Monoid[Int], remaining: List[Int])
-~~~
+```
 
 This represents an addition that is "in flight" in some sense. It's an accumulated value so far, represented by `acc`, a monoid `m` that was used to accumulate `acc`, and a list of `remaining` elements to add to the accumulation using the monoid.
 
@@ -536,19 +537,19 @@ Now, if we have _two_ values of type `Suspended`, how would we add them together
 
 In Haskell, there is only one abstract monoidal operation and one zero. They are both polymorphic, and their signatures are:
 
-~~~ haskell
+``` haskell
 mappend :: Monoid m => m -> m -> m
 mempty :: Monoid m => m
-~~~
+```
 
 This reads: "for any type `m`, if `m` is a monoid, `mappend` takes an `m` and another `m` and returns an `m`", and "`mempty` is a value of any type `m`, given that `m` is a monoid."
 
 How do we then represent types that are monoids in more than one way, for example `Int` with addition as one monoid and multiplication as another? The answer is that we make each monoid a [newtype](http://www.haskell.org/haskellwiki/Newtype):
 
-~~~ haskell
+``` haskell
 newtype Product = Product { getProduct :: Int }
 newtype Sum = Sum { getSum :: Int }
-~~~
+```
 
 A newtype in Haskell is a lot like a case class in Scala, except that newtypes can only have exactly one field, and they have _no runtime representation_ other than the underlying type of that field. It's a purely type-level construct, a kind of tagged type.
 
@@ -556,10 +557,10 @@ Using this mechanism, a product and a sum are actually different types, even tho
 
 [The Scalaz library](https://github.com/scalaz/scalaz) takes the same approach, where there is only one canonical monoid per type. However, since Scala doesn't have type constraints, the canonicity of monoids is more of a convention than something enforced by the type system. And since Scala doesn't have newtypes, we use [phantom types](http://www.haskell.org/haskellwiki/Phantom_type) to add tags to the underlying types. This is done with [`scalaz.Tag`](http://docs.typelevel.org/api/scalaz/stable/7.1.0-M3/doc/#scalaz.Tags$), which uses a couple of type aliases:
 
-~~~ scala
+``` scala
 type Tagged[A] = AnyRef { type T = A }
 type @@[A,B] = A with Tagged[B]
-~~~
+```
 
 Now the type `Int @@ Product`, for example, is just the type `Int`, but "tagged" with `Product` to make it explicit that `Monoid[Int @@ Product]` is distinct from `Monoid[Int @@ Sum]`. The types `Product` and `Sum` themselves are just empty traits with no members whatsoever.
 
@@ -567,7 +568,7 @@ Tim Perrett wrote a [blog post](http://timperrett.com/2012/06/15/unboxed-new-typ
 
 The great benefit of canonicity is that Scalaz can build a monoid instance for you just from the type. For example, if you have a `Map[Int, Map[String, (Int, Boolean)]]`, Scalaz can figure out a canonical composite monoid for this type:
 
-~~~ scala
+``` scala
 import scalaz._
 import Scalaz._
 import Tags._
@@ -576,7 +577,7 @@ val x = Map(1 -> Map("Foo" -> (1, Conjunction(false))))
 val y = Map(1 -> Map("Foo" -> (2, Conjunction(true))))
 
 val z = x |+| y
-~~~
+```
 
 The value of `z` will be `Map(1 -> Map("Foo" -> (3, Conjunction(false))))`. Here, `Conjunction` is a "newtype" for `Boolean` to indicate that we want the "conjunction" monoid (`Boolean` with `&&` as the op and `true` as the identity element). There's a corresponding `Disjunction` for `||` with `false`. At the present time, Scalaz's default monoid for `Int` is addition, which is why we get `3` in `z`.
 
@@ -903,21 +904,21 @@ The difference is easy to demonstrate in theory, but takes some experience to fu
 
 Consider composition in a monad, via `compose` (Kleisli composition):
 
-~~~ scala
+``` scala
 val foo: A => F[B] = ???
 val bar: B => F[C] = ???
 val baz: A => F[C] = bar compose foo
-~~~
+```
 
 There is no way that the implementation of the `compose` function in the `Monad[F]` instance can inspect the values `foo` and `bar`. They are functions, so the only way to "see inside" them is to give them arguments. The values of type `F[B]` and `F[C]` respectively are not determined until the composite function _runs_.
 
 Contrast this with combining values with `map2`:
 
-~~~ scala
+``` scala
 val quux: F[A] = ???
 val corge: F[B] = ???
 val grault: F[C] = map2(quux, corge)(f)
-~~~
+```
 
 Here the implementation of `map2` can actually look at the values `quux` and `corge`, and take different paths depending on what they are. For instance, it might rewrite them to a normal form for improved efficiency. If `F` is something like `Future`, it might decide to start immediately evaluating them on different threads. If the data type `F` is applicative but _not a monad_, then the implementation has this flexibility universally. There is then never any chance that an expression in `F` is going to involve functions of the form `A => F[B]` that it can't see inside of.
 
@@ -938,10 +939,10 @@ In the chapter, we decided to present the `Applicative` laws in terms of `map2`.
 
 But there are other ways to state the laws for `Applicative`. Commonly the laws for applicative are stated in terms of `apply`, which is sometimes called _idiomatic function application_ (where the "idiom" is `F`):
 
-~~~ scala
+``` scala
 def apply[A,B](ff: F[A => B], fa: F[A]): F[B] =
   map2(ff, fa)(_(_))
-~~~
+```
 
 The laws for `apply` are _identity_, _homomorphism_, _interchange_, and _composition_.
 
@@ -949,9 +950,9 @@ The laws for `apply` are _identity_, _homomorphism_, _interchange_, and _composi
 
 The identity law for `apply` is stated as:
 
-~~~ scala
+``` scala
 apply(unit(id), v) == v
-~~~
+```
 
 That is, `unit` of the identity function is an identity for `apply`.
 
@@ -959,9 +960,9 @@ That is, `unit` of the identity function is an identity for `apply`.
 
 The homomorphism law for `apply` is stated as:
 
-~~~ scala
+``` scala
 apply(unit(f), unit(x)) == unit(f(x))
-~~~
+```
 
 In other words, idiomatic function application on `unit`s is the same as the `unit` of regular function application. In more precise words, `unit` is a homomorphism from `A` to `F[A]` with regard to function application.
 
@@ -969,9 +970,9 @@ In other words, idiomatic function application on `unit`s is the same as the `un
 
 The interchange law for `apply` is stated as:
 
-~~~ scala
+``` scala
 apply(u, unit(y)) == apply(unit(_(y)), u)
-~~~
+```
 
 This law is essentially saying that `unit` is not allowed to carry an effect with regard to any implementation of our applicative functor. If one argument to `apply` is a `unit`, then the other can appear in either position. In other words, it should not matter when we evaluate a `unit`.
 
@@ -979,15 +980,15 @@ This law is essentially saying that `unit` is not allowed to carry an effect wit
 
 The composition law for `apply` is stated as:
 
-~~~ scala
+``` scala
 apply(u, apply(v, w)) == apply(apply(apply(unit(f => g => f compose g), u), v), w)
-~~~
+```
 
 This is saying that applying `v` to `w` and then applying `u` to that is the same as applying composition to `u`, then `v`, and then applying the composite function to `w`. Intuitively it's saying the same as:
 
-~~~ scala
+``` scala
 u(v(w)) == (u compose v)(w)
-~~~
+```
 
 We might state this law simply as: "function composition in an applicative functor works in the obvious way."
 
@@ -995,13 +996,13 @@ We might state this law simply as: "function composition in an applicative funct
 
 The applicative laws taken together can be seen as saying that we can rewrite any expression involving `unit` or `apply` (and therefore by extension `map2`), into a normal form having one of the following shapes:
 
-~~~ scala
+``` scala
 pure(x)          // for some x
 map(x)(f)        // for some x and f
 map2(x, y)(f)    // for some x, y, and f
 map3(x, y, z)(f) // for some x, y, z, and f
 // etc.
-~~~
+```
 
 Where `f`, `x`, `y`, and `z` do not involve the `Applicative` primitives at all. That is, every expression in an applicative functor `A` can be seen as lifting some pure function `f` over a number of arguments in `A`.
 
@@ -1013,9 +1014,9 @@ Note that this reasoning is lost when the applicative happens to be a monad and 
 
 The `scalaz.syntax.applicative` object supplies implicit syntax for applicatives to lift a function of arbitrary arity:
 
-~~~ scala
+``` scala
 (x |@| y |@| z)(f)
-~~~
+```
 
 This is equivalent to `lift3(x, y, z)(f)`.
 
@@ -1060,11 +1061,11 @@ Monads were discovered as a way of embedding effectful code into a pure language
 
 There are various ways of representing the `Free` data type we made use of here. The traditional formulation would be in terms of just two constructors, `Return` and `Suspend`:
 
-~~~ scala
+``` scala
 trait Free[F[_],A]
 case class Return[F[_],A](a: A) extends Free[F,A]
 case class Suspend[F[_],A](f: F[Free[F, A]]) extends Free[F,A]
-~~~
+```
 
 This type forms a `Monad` given only a `Functor[F]`. See [Free Monads and the Yoneda Lemma](http://blog.higher-order.com/blog/2013/11/01/free-and-yoneda/) which talks about the relationship between these various formulations of `Free` and introduces some relevant category theory. 
 
@@ -1072,12 +1073,12 @@ This type forms a `Monad` given only a `Functor[F]`. See [Free Monads and the Yo
 
 The naive, two-constructor representation of `Free` above has quadratic complexity for left-associated sequences of `flatMap` (more standard terminology is "bind" rather than `flatMap`). For example:
 
-~~~ scala
+``` scala
 def f(i: Int): Free[F,Int] = ...
 val acc: Free[F,Int] = ...
 
 val bad = (0 until N).map(f).foldLeft(acc)(_.map2(_)(_ + _))
-~~~
+```
 
 This requires repeated trips to the "end" of the increasingly long chain to attach a further `map2`. The first iteration requires 1 step, the next requires 2 steps, then 3 steps, and so on, up to `N`, leading to quadratic complexity. See [Reflection without remorse](http://homepages.cwi.nl/~ploeg/papers/zseq.pdf) which gives a very nice overview of the general problem, discusses historical solutions and their tradeoffs, and presents a new solution based on _type-aligned sequences_. Our solution given in the text rewrites binds to the right during [interpretation in the `runFree` function](https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/iomonad/IO.scala#L419), which assumes that the target `Monad` has efficient implementation for right-associated binds.
 
@@ -1085,17 +1086,17 @@ This requires repeated trips to the "end" of the increasingly long chain to atta
 
 The `Translate` type we introduced in this chapter is a common idiom for getting around Scala's lack of support for _first-class, universally quantified values_. We'd like for `runFree` to just accept a `forall A . F[A] => G[A]` (this is not valid Scala syntax), but first-class functions and in fact all first-class values in Scala are monomorphic--any type parameters they mention must be fixed to some particular types. To get around this restriction, we defined `Translate[F,G]`:
 
-~~~ scala
+``` scala
 trait Translate[F[_],G[_]] {
   def apply[A](f: F[A]): G[A]
 }
-~~~
+```
 
 Although values must be monomorphic, _methods_ in Scala can of course be polymorphic, so we simply introduce a new first-class type containing a polymorphic method. Unfortunately, this means that various polymorphic methods we might have lying around must be explicitly wrapped in `Translate`:
 
-~~~ scala
+``` scala
 def headOption[A](a: List[A]): Option[A]
-~~~
+```
 
 Even though `headOption` is polymorphic, we would need to explicitly wrap it in a `Translate[List,Option]` if we ever needed to use it polymorphically in a first-class way. Another drawback of this approach is that we require separate versions of `Translate` for different "shapes" of the input and output type constructors--for instance, in chapter 14, we define a type `RunnableST`, which would typically just be represented using a universally quantified ordinary value, without needing wrapping in a new type.
 
@@ -1107,7 +1108,7 @@ See [Free Monads and Free Monoids](http://blog.higher-order.com/blog/2013/08/20/
 
 The `ST` data type covered in this chapter was first introduced in [Lazy Functional State Threads](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.50.3299). The general idea, of using universal quantification to uniquely tag variables and enforce scoping, is also useful in other situations. For instance, we can use the same idea to enforce a 'safe' API for accessing file handles, preventing a file handle from being referenced after it passes out of scope. Here is a sketch of an API:
 
-~~~ scala
+``` scala
 trait Handle[R]
 
 trait SafeIO[S,+A] {
@@ -1130,7 +1131,7 @@ object SafeIO {
 
 /** A 'runnable' `SafeIO` must be universally quantified in `S`. */
 trait RunIO[A] { def run[S]: SafeIO[S,A] }
-~~~
+```
 
 By tagging `Handle` values with the scope in which they originate, we prevent running a `SafeIO` whose value incorporates a `Handle`, and we are also prevented from mixing `Handle` values originating in different scopes. Thus, any `Handle` values allocated during `run` may be safely closed when the `IO` action returned from `run` completes.  
 

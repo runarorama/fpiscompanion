@@ -1,3 +1,4 @@
+license.txt
 notes.txt
 answers.txt
 haskell.txt
