@@ -864,19 +864,19 @@ def tails: Stream[Stream[A]] =
 
 ### Exercise 5.16
 
-``` scala
-/*
 The function can't be implemented using `unfold`, since `unfold` generates elements of the `Stream` from left to right. It can be implemented using `foldRight` though.
 
 The implementation is just a `foldRight` that keeps the accumulated value and the stream of intermediate results, which we `cons` onto during each iteration. When writing folds, it's common to have more state in the fold than is needed to compute the result. Here, we simply extract the accumulated list once finished.
-*/
-  def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
-    foldRight((z, Stream(z)))((a, p0) => {
-      // p0 is passed by-name and used in by-name args in f and cons. So use lazy val to ensure only one evaluation...
-      lazy val p1 = p0
-      val b2 = f(a, p1._1)
-      (b2, cons(b2, p1._2))
-    })._2
+
+``` scala
+def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
+  foldRight((z, Stream(z)))((a, p0) => {
+    // p0 is passed by-name and used in by-name args in f and cons.
+    // So use lazy val to ensure only one evaluation...
+    lazy val p1 = p0
+    val b2 = f(a, p1._1)
+    (b2, cons(b2, p1._2))
+  })._2
 ```
 
 ## Answers to exercises for chapter 6
@@ -966,15 +966,16 @@ val _double: Rand[Double] =
 
 ### Exercise 6.06
 
+This implementation of `map2` passes the initial `RNG` to the first argument
+and the resulting `RNG` to the second argument. It's not necessarily wrong
+to do this the other way around, since the results are random anyway.
+We could even pass the initial `RNG` to both `f` and `g`, but that might
+have unexpected results. E.g. if both arguments are `RNG.int` then we would
+always get two of the same `Int` in the result. When implementing functions
+like this, it's important to consider how we would test them for
+correctness.
+
 ``` scala
-// This implementation of map2 passes the initial RNG to the first argument
-// and the resulting RNG to the second argument. It's not necessarily wrong
-// to do this the other way around, since the results are random anyway.
-// We could even pass the initial RNG to both `f` and `g`, but that might
-// have unexpected results. E.g. if both arguments are `RNG.int` then we would
-// always get two of the same `Int` in the result. When implementing functions
-// like this, it's important to consider how we would test them for
-// correctness.
 def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
   rng => {
     val (a, r1) = ra(rng)
@@ -985,26 +986,28 @@ def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
 
 ### Exercise 6.07
 
+In `sequence`, the base case of the fold is a `unit` action that returns
+the empty list. At each step in the fold, we accumulate in `acc`
+and `f` is the current element in the list.
+`map2(f, acc)(_ :: _)` results in a value of type `Rand[List[A]]`
+We map over that to prepend (cons) the element onto the accumulated list.
+
+We are using `foldRight`. If we used `foldLeft` then the values in the
+resulting list would appear in reverse order. It would be arguably better
+to use `foldLeft` followed by `reverse`. What do you think?
+
 ``` scala
-// In `sequence`, the base case of the fold is a `unit` action that returns
-// the empty list. At each step in the fold, we accumulate in `acc`
-// and `f` is the current element in the list.
-// `map2(f, acc)(_ :: _)` results in a value of type `Rand[List[A]]`
-// We map over that to prepend (cons) the element onto the accumulated list.
-//
-// We are using `foldRight`. If we used `foldLeft` then the values in the
-// resulting list would appear in reverse order. It would be arguably better
-// to use `foldLeft` followed by `reverse`. What do you think?
 def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
   fs.foldRight(unit(List[A]()))((f, acc) => map2(f, acc)(_ :: _))
+```
 
-// It's interesting that we never actually need to talk about the `RNG` value
-// in `sequence`. This is a strong hint that we could make this function
-// polymorphic in that type.
+It's interesting that we never actually need to talk about the `RNG` value
+in `sequence`. This is a strong hint that we could make this function
+polymorphic in that type.
 
+``` scala
 def _ints(count: Int): Rand[List[Int]] =
   sequence(List.fill(count)(int))
-
 ```
 
 ### Exercise 6.08
@@ -1022,7 +1025,6 @@ def nonNegativeLessThan(n: Int): Rand[Int] = {
     if (i + (n-1) - mod >= 0) unit(mod) else nonNegativeLessThan(n)
   }
 }
-
 ```
 
 ### Exercise 6.09
@@ -1574,25 +1576,35 @@ def many1[A](p: Parser[A]): Parser[List[A]] =
 
 `product` is associative. These two expressions are "roughly" equal:
 
-    (a ** b) ** c
-    a ** (b ** c)
+``` scala
+(a ** b) ** c
+a ** (b ** c)
+```
 
 The only difference is how the pairs are nested. The `(a ** b) ** c` parser returns an `((A,B), C)`, whereas the `a ** (b ** c)` returns an `(A, (B,C))`. We can define functions `unbiasL` and `unbiasR` to convert these nested tuples to flat 3-tuples:
 
-  def unbiasL[A,B,C](p: ((A,B), C)): (A,B,C) = (p._1._1, p._1._2, p._2)
-  def unbiasR[A,B,C](p: (A, (B,C))): (A,B,C) = (p._1, p._2._1, p._2._2)
+``` scala
+def unbiasL[A,B,C](p: ((A,B), C)): (A,B,C) = (p._1._1, p._1._2, p._2)
+def unbiasR[A,B,C](p: (A, (B,C))): (A,B,C) = (p._1, p._2._1, p._2._2)
+```
 
 With these, we can now state the associativity property:
 
-    (a ** b) ** c map (unbiasL) == a ** (b ** c) map (unbiasR)
+``` scala
+(a ** b) ** c map (unbiasL) == a ** (b ** c) map (unbiasR)
+```
 
 We'll sometimes just use `~=` when there is an obvious bijection between the two sides:
 
-    (a ** b) ** c ~= a ** (b ** c)
+``` scala
+(a ** b) ** c ~= a ** (b ** c)
+```
 
 `map` and `product` also have an interesting relationship--we can `map` either before or after taking the product of two parsers, without affecting the behavior:
 
-    a.map(f) ** b.map(g) == (a ** b) map { case (a,b) => (f(a), g(b)) }
+``` scala
+a.map(f) ** b.map(g) == (a ** b) map { case (a,b) => (f(a), g(b)) }
+```
 
 For instance, if `a` and `b` were both `Parser[String]`, and `f` and `g` both computed the length of a string, it doesn't matter if we map over the result of `a` to compute its length, or whether we do that _after_ the product.
 
@@ -1603,8 +1615,6 @@ See chapter 12 for more discussion of these laws.
 ``` scala
 def many[A](p: Parser[A]): Parser[List[A]] =
   map2(p, many(p))(_ :: _) or succeed(List())
-
-
 ```
 
 ### Exercise 9.04
@@ -1613,7 +1623,6 @@ def many[A](p: Parser[A]): Parser[List[A]] =
 def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] =
   if (n <= 0) succeed(List())
   else map2(p, listOfN(n-1, p))(_ :: _)
-
 ```
 
 ### Exercise 9.05
@@ -1758,9 +1767,9 @@ See a fully worked implementation in `instances/Sliceable.scala` in the answers.
 
 ### Exercise 9.18
 
-``` scala
-// We'll just give a sketch here. The basic idea is to add an additional field to `ParseError`
+We'll just give a sketch here. The basic idea is to add an additional field to `ParseError`:
 
+``` scala
 case class ParseError(stack: List[(Location,String)] = List(),
                       otherFailures: List[ParseError] = List()) {
 
@@ -1768,21 +1777,23 @@ case class ParseError(stack: List[(Location,String)] = List(),
     this.copy(otherFailures = e :: this.otherFailures)
   ...
 }
-
-// We then need to make sure we populate this in the implementation of `or`
-  def or[A](p: Parser[A], p2: => Parser[A]): Parser[A] =
-    s => p(s) match {
-      case Failure(e,false) => p2(s).mapError(_.addFailure(e))
-      case r => r // committed failure or success skips running `p2`
-    }
-
-// Of course, we have to decide how to print a `ParseError` for human consumption
-// We also can expose combinators for selecting which error(s) get reported in the
-// event that a chain of `a | b | c` fails--we might choose to collect up all the
-// errors for each of the three parsers, or perhaps only show the parser that got
-// the furthest in the input before failing, etc
-
 ```
+
+We then need to make sure we populate this in the implementation of `or`
+
+``` scala
+def or[A](p: Parser[A], p2: => Parser[A]): Parser[A] =
+  s => p(s) match {
+    case Failure(e,false) => p2(s).mapError(_.addFailure(e))
+    case r => r // committed failure or success skips running `p2`
+  }
+```
+
+Of course, we have to decide how to print a `ParseError` for human consumption
+We also can expose combinators for selecting which error(s) get reported in the
+event that a chain of `a | b | c` fails--we might choose to collect up all the
+errors for each of the three parsers, or perhaps only show the parser that got
+the furthest in the input before failing, etc
 
 ## Answers to exercises for chapter 10
 
@@ -1812,15 +1823,15 @@ val booleanAnd: Monoid[Boolean] = new Monoid[Boolean] {
 
 ### Exercise 10.02
 
-``` scala
-// Notice that we have a choice in how we implement `op`.
-// We can compose the options in either order. Both of those implementations
-// satisfy the monoid laws, but they are not equivalent.
-// This is true in general--that is, every monoid has a _dual_ where the
-// `op` combines things in the opposite order. Monoids like `booleanOr` and
-// `intAddition` are equivalent to their duals because their `op` is commutative
-// as well as associative.
+Notice that we have a choice in how we implement `op`.
+We can compose the options in either order. Both of those implementations
+satisfy the monoid laws, but they are not equivalent.
+This is true in general--that is, every monoid has a _dual_ where the
+`op` combines things in the opposite order. Monoids like `booleanOr` and
+`intAddition` are equivalent to their duals because their `op` is commutative
+as well as associative.
 
+``` scala
 def optionMonoid[A]: Monoid[Option[A]] = new Monoid[Option[A]] {
   def op(x: Option[A], y: Option[A]) = x orElse y
   val zero = None
@@ -1880,15 +1891,19 @@ def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B =
 
 ### Exercise 10.06
 
+The function type `(A, B) => B`, when curried, is `A => (B => B)`.
+And of course, `B => B` is a monoid for any `B` (via function composition).
+
 ``` scala
-// The function type `(A, B) => B`, when curried, is `A => (B => B)`.
-// And of course, `B => B` is a monoid for any `B` (via function composition).
 def foldRight[A, B](as: List[A])(z: B)(f: (A, B) => B): B =
   foldMap(as, endoMonoid[B])(f.curried)(z)
+```
 
-// Folding to the left is the same except we flip the arguments to
-// the function `f` to put the `B` on the correct side.
-// Then we have to also "flip" the monoid so that it operates from left to right.
+Folding to the left is the same except we flip the arguments to
+the function `f` to put the `B` on the correct side.
+Then we have to also "flip" the monoid so that it operates from left to right.
+
+``` scala
 def foldLeft[A, B](as: List[A])(z: B)(f: (B, A) => B): B =
   foldMap(as, dual(endoMonoid[B]))(a => b => f(b, a))(z)
 ```
