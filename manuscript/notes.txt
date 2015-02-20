@@ -894,7 +894,7 @@ Other useful comonads include [Rose Trees](http://docs.typelevel.org/api/scalaz/
 * [The essence of functional programming](http://www.eliza.ch/doc/wadler92essence_of_FP.pdf) by Philip Wadler.
 * [Notions of computation and monads](http://www.disi.unige.it/person/MoggiE/ftp/ic91.pdf) by Eugenio Moggi.
 
-## Notes on chapter 12: Applicative able functors
+## Notes on chapter 12: Applicative and traversable functors
 
 ### The cost of power
 

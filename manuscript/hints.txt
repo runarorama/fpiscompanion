@@ -1,0 +1,6 @@
+# Hints for exercises
+
+This section contains hints for various exercises in the book, to help you get started in coming up with an answer, or to get you unstuck if you run into trouble.
+
+Not all exercises have hints. If you think of a good hint for an exercise and would like it to be available to other readers, submit a pull request to [the book's GitHub repository.](https://github.com/fpinscala/fpinscala) The electronic version of these hints is available under the `answerkey` directory in that repository.
+
