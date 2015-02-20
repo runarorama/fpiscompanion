@@ -1,0 +1,1 @@
+All content on this wiki, including code and documentation, is licensed using [the MIT license](http://opensource.org/licenses/MIT). Contributors to this wiki agree to license their contributions using the MIT license.
