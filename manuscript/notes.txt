@@ -818,7 +818,7 @@ trait Adjunction[F[_], G[_]] {
 
 `counit` is pronounced "co-unit", not "cow-knit".
 
-We say that `F` is _left adjoint_ to `G`, written `F ⊣ G` in mathematical notation.
+We say that `F` is _left adjoint_ to `G`, written {$$}F \dashv G{/$$} in mathematical notation.
 
 There are two laws of adjunctions:
 
