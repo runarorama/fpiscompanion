@@ -1,6 +1,6 @@
 # Answers to exercises
 
-This section contains answers to exercises in the book. Note that only one answer is given per exercise, but there may be more than one correct answer. We highly recommend that you check out [the book's source code repository from GitHub](https://github.com/fpinscala/fpinscala) and look at the answers given there for each chapter. Those answers contain much more detailed explanations, more varied solutions, and in some cases complete implementations that do not fit in this booklet.
+This section contains answers to exercises in the book. Note that usually only one answer is given per exercise, but there may be more than one correct answer. We highly recommend that you check out [the book's source code repository from GitHub](https://github.com/fpinscala/fpinscala) and look at the answers given there for each chapter. Those answers are shown *in context*, with more detailed explanations, more varied solutions, and in some cases complete implementations that do not fit in this booklet.
 
 ## Answers to exercises for chapter 2
 
@@ -14,10 +14,9 @@ def fib(n: Int): Int = {
     else loop(n - 1, cur, prev + cur)
   loop(n, 0, 1)
 }
-
-// 0 and 1 are the first two numbers in the sequence, so we start the accumulators with those.
-// At every iteration, we add the two numbers to get the next one.
 ```
+
+0 and 1 are the first two numbers in the sequence, so we start the accumulators with those. At every iteration, we add the two numbers to get the next one.
 
 ### Exercise 2.02
 
@@ -35,23 +34,24 @@ def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = {
 
 ### Exercise 2.03
 
+Note that `=>` associates to the right, so we could write the return type as
+   `A => B => C`
+
 ``` scala
-/* Note that `=>` associates to the right, so we could write the return type as
-   `A => B => C` */
 def curry[A,B,C](f: (A, B) => C): A => (B => C) =
   a => b => f(a, b)
-
-/* NB: The `Function2` trait has a `curried` method already, so if you wanted to
-   cheat a little you could write the answer as f.curried */
 ```
+
+NB: The `Function2` trait has a `curried` method already, so if you wanted to
+   cheat a little you could write the answer as `f.curried`
 
 ### Exercise 2.04
 
 ``` scala
 def uncurry[A,B,C](f: A => B => C): (A, B) => C =
   (a, b) => f(a)(b)
+```
 
-/*
 NB: There is a method on the `Function` object in the standard library,
 `Function.uncurried` that you can use for uncurrying.
 
@@ -59,8 +59,6 @@ Note that we can go back and forth between the two forms. We can curry and uncur
 and the two forms are in some sense "the same". In FP jargon, we say that they
 are _isomorphic_ ("iso" = same; "morphe" = shape, form), a term we inherit from
 category theory.
-*/
-```
 
 ### Exercise 2.05
 
@@ -73,20 +71,15 @@ def compose[A,B,C](f: B => C, g: A => B): A => C =
 
 ### Exercise 3.01
 
-``` scala
-/* 
-3. The third case is the first that matches, with `x` bound to 1 and `y` bound to 2. 
-*/
-```
+Three. The third case is the first that matches, with `x` bound to 1 and `y` bound to 2. 
 
 ### Exercise 3.02
 
-``` scala
-/*
 Although we could return `Nil` when the input list is empty, we choose to throw an exception instead. This is a somewhat subjective choice. In our experience, taking the tail of an empty list is often a bug, and silently returning a value just means this bug will be discovered later, further from the place where it was introduced. 
 
 It's generally good practice when pattern matching to use `_` for any variables you don't intend to use on the right hand side of a pattern. This makes it clear the value isn't relevant.  
-*/
+
+``` scala
 def tail[A](l: List[A]): List[A] = 
   l match {
     case Nil => sys.error("tail of empty list")
@@ -96,10 +89,9 @@ def tail[A](l: List[A]): List[A] =
 
 ### Exercise 3.03
 
-``` scala
-/*
 If a function body consists solely of a match expression, we'll often put the match on the same line as the function signature, rather than introducing another level of nesting.
-*/
+
+``` scala
 def setHead[A](l: List[A], h: A): List[A] = l match {
   case Nil => sys.error("setHead on empty list")
   case Cons(_,t) => Cons(h,t)
@@ -108,10 +100,9 @@ def setHead[A](l: List[A], h: A): List[A] = l match {
 
 ### Exercise 3.04
 
-``` scala
-/* 
 Again, it's somewhat subjective whether to throw an exception when asked to drop more elements than the list contains. The usual default for `drop` is not to throw an exception, since it's typically used in cases where this is not indicative of a programming error. If you pay attention to how you use `drop`, it's often in cases where the length of the input list is unknown, and the number of elements to be dropped is being computed from something else. If `drop` threw an exception, we'd have to first compute or check the length and only drop up to that many elements.  
-*/
+
+``` scala
 def drop[A](l: List[A], n: Int): List[A] = 
   if (n <= 0) l
   else l match {
@@ -122,13 +113,12 @@ def drop[A](l: List[A], n: Int): List[A] =
 
 ### Exercise 3.05
 
-``` scala
-/* 
-Somewhat overkill, but to illustrate the feature we're using a _pattern guard_,
+Somewhat overkill, but to illustrate the feature we're using a *pattern guard*,
 to only match a `Cons` whose head satisfies our predicate, `f`. 
 The syntax is to add `if <cond>` after the pattern, before the `=>`, 
 where `<cond>` can use any of the variables introduced by the pattern.
-*/
+
+``` scala
 def dropWhile[A](l: List[A], f: A => Boolean): List[A] = 
   l match {
     case Cons(h,t) if f(h) => dropWhile(t, f) 
@@ -139,12 +129,11 @@ def dropWhile[A](l: List[A], f: A => Boolean): List[A] =
 
 ### Exercise 3.06
 
-``` scala
-/*
 Note that we're copying the entire list up until the last element. Besides being inefficient, the natural recursive solution will use a stack frame for each element of the list, which can lead to stack overflows for large lists (can you see why?). With lists, it's common to use a temporary, mutable buffer internal to the function (with lazy lists or streams, which we discuss in chapter 5, we don't normally do this). So long as the buffer is allocated internal to the function, the mutation is not observable and RT is preserved.
 
 Another common convention is to accumulate the output list in reverse order, then reverse it at the end, which doesn't require even local mutation. We'll write a reverse function later in this chapter.
-*/
+
+``` scala
 def init[A](l: List[A]): List[A] = 
   l match { 
     case Nil => sys.error("init of empty list")
@@ -166,24 +155,18 @@ def init2[A](l: List[A]): List[A] = {
 
 ### Exercise 3.07
 
-``` scala
-/* 
-No, this is not possible! The reason is because _before_ we ever call our function, `f`, we evaluate its argument, which in the case of `foldRight` means traversing the list all the way to the end. We need _non-strict_ evaluation to support early termination---we discuss this in chapter 5.
-*/
-```
+No, this is not possible! The reason is because *before* we ever call our function, `f`, we evaluate its argument, which in the case of `foldRight` means traversing the list all the way to the end. We need _non-strict_ evaluation to support early termination---we discuss this in chapter 5.
 
 ### Exercise 3.08
 
-``` scala
-/* 
 We get back the original list! Why is that? As we mentioned earlier, one way of thinking about what `foldRight` "does" is it replaces the `Nil` constructor of the list with the `z` argument, and it replaces the `Cons` constructor with the given function, `f`. If we just supply `Nil` for `z` and `Cons` for `f`, then we get back the input list. 
 
+``` scala
 foldRight(Cons(1, Cons(2, Cons(3, Nil))), Nil:List[Int])(Cons(_,_))
 Cons(1, foldRight(Cons(2, Cons(3, Nil)), Nil:List[Int])(Cons(_,_)))
 Cons(1, Cons(2, foldRight(Cons(3, Nil), Nil:List[Int])(Cons(_,_))))
 Cons(1, Cons(2, Cons(3, foldRight(Nil, Nil:List[Int])(Cons(_,_)))))
 Cons(1, Cons(2, Cons(3, Nil))) 
-*/
 ```
 
 ### Exercise 3.09
@@ -195,10 +178,9 @@ def length[A](l: List[A]): Int =
 
 ### Exercise 3.10
 
-``` scala
-/* 
 It's common practice to annotate functions you expect to be tail-recursive with the `tailrec` annotation. If the function is not tail-recursive, it will yield a compile error, rather than silently compiling the code and resulting in greater stack space usage at runtime. 
-*/
+
+``` scala
 @annotation.tailrec
 def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match { 
   case Nil => z
@@ -223,12 +205,11 @@ def reverse[A](l: List[A]): List[A] = foldLeft(l, List[A]())((acc,h) => Cons(h,a
 
 ### Exercise 3.13
 
-``` scala
-/*
 The implementation of `foldRight` in terms of `reverse` and `foldLeft` is a common trick for avoiding stack overflows when implementing a strict `foldRight` function as we've done in this chapter. (We'll revisit this in a later chapter, when we discuss laziness).
 
 The other implementations build up a chain of functions which, when called, results in the operations being performed with the correct associativity. We are calling `foldRight` with the `B` type being instantiated to `B => B`, then calling the built up function with the `z` argument. Try expanding the definitions by substituting equals for equals using a simple example, like `foldLeft(List(1,2,3), 0)(_ + _)` if this isn't clear. Note these implementations are more of theoretical interest - they aren't stack-safe and won't work for large lists.
-*/
+
+``` scala
 def foldRightViaFoldLeft[A,B](l: List[A], z: B)(f: (A,B) => B): B = 
   foldLeft(reverse(l), z)((b,a) => f(a,b))
 
@@ -241,22 +222,20 @@ def foldLeftViaFoldRight[A,B](l: List[A], z: B)(f: (B,A) => B): B =
 
 ### Exercise 3.14
 
-``` scala
-/*
 `append` simply replaces the `Nil` constructor of the first list with the second list, which is exactly the operation performed by `foldRight`.
-*/
+
+``` scala
 def appendViaFoldRight[A](l: List[A], r: List[A]): List[A] = 
   foldRight(l, r)(Cons(_,_))
 ```
 
 ### Exercise 3.15
 
-``` scala
-/*
 Since `append` takes time proportional to its first argument, and this first argument never grows because of the right-associativity of `foldRight`, this function is linear in the total length of all lists. You may want to try tracing the execution of the implementation on paper to convince yourself that this works. 
 
 Note that we're simply referencing the `append` function, without writing something like `(x,y) => append(x,y)` or `append(_,_)`. In Scala there is a rather arbitrary distinction between functions defined as _methods_, which are introduced with the `def` keyword, and function values, which are the first-class objects we can pass to other functions, put in collections, and so on. This is a case where Scala lets us pretend the distinction doesn't exist. In other cases, you'll be forced to write `append _` (to convert a `def` to a function value) or even `(x: List[A], y: List[A]) => append(x,y)` if the function is polymorphic and the type arguments aren't known. 
-*/
+
+``` scala
 def concat[A](l: List[List[A]]): List[A] = 
   foldRight(l, Nil:List[A])(append)
 ```
@@ -277,10 +256,9 @@ def doubleToString(l: List[Double]): List[String] =
 
 ### Exercise 3.18
 
-``` scala
-/* 
 A natural solution is using `foldRight`, but our implementation of `foldRight` is not stack-safe. We can use `foldRightViaFoldLeft` to avoid the stack overflow (variation 1), but more commonly, with our current implementation of `List`, `map` will just be implemented using local mutation (variation 2). Again, note that the mutation isn't observable outside the function, since we're only mutating a buffer that we've allocated. 
-*/
+
+``` scala
 def map[A,B](l: List[A])(f: A => B): List[B] = 
   foldRight(l, Nil:List[B])((h,t) => Cons(f(h),t))
 
@@ -340,12 +318,11 @@ def filterViaFlatMap[A](l: List[A])(f: A => Boolean): List[A] =
 
 ### Exercise 3.22
 
-``` scala
-/* 
 To match on multiple values, we can put the values into a pair and match on the pair, as shown next, and the same syntax extends to matching on N values (see sidebar "Pairs and tuples in Scala" for more about pair and tuple objects). You can also (somewhat less conveniently, but a bit more efficiently) nest pattern matches: on the right hand side of the `=>`, simply begin another `match` expression. The inner `match` will have access to all the variables introduced in the outer `match`. 
 
 The discussion about stack usage from the explanation of `map` also applies here.
-*/
+
+``` scala
 def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match {
   case (Nil, _) => Nil
   case (_, Nil) => Nil
@@ -355,10 +332,9 @@ def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match {
 
 ### Exercise 3.23
 
-``` scala
-/* 
 This function is usually called `zipWith`. The discussion about stack usage from the explanation of `map` also applies here. By putting the `f` in the second argument list, Scala can infer its type from the previous argument list. 
-*/
+
+``` scala
 def zipWith[A,B,C](a: List[A], b: List[B])(f: (A,B) => C): List[C] = (a,b) match {
   case (Nil, _) => Nil
   case (_, Nil) => Nil
@@ -368,8 +344,6 @@ def zipWith[A,B,C](a: List[A], b: List[B])(f: (A,B) => C): List[C] = (a,b) match
 
 ### Exercise 3.24
 
-``` scala
-/*
 There's nothing particularly bad about this implementation,
 except that it's somewhat monolithic and easy to get wrong.
 Where possible, we prefer to assemble functions like this using
@@ -379,7 +353,8 @@ implementation we need special purpose logic to break out of our
 loops early. In Chapter 5 we'll discuss ways of composing functions
 like this from simpler components, without giving up the efficiency
 of having the resulting functions work in one pass over the data.
-*/
+
+``` scala
 @annotation.tailrec
 def startsWith[A](l: List[A], prefix: List[A]): Boolean = (l,prefix) match {
   case (_,Nil) => true
@@ -406,12 +381,11 @@ def size[A](t: Tree[A]): Int = t match {
 
 ### Exercise 3.26
 
-``` scala
-/*
 We're using the method `max` that exists on all `Int` values rather than an explicit `if` expression.
 
 Note how similar the implementation is to `size`. We'll abstract out the common pattern in a later exercise. 
-*/
+
+``` scala
 def maximum(t: Tree[Int]): Int = t match {
   case Leaf(n) => n
   case Branch(l,r) => maximum(l) max maximum(r)
@@ -420,10 +394,9 @@ def maximum(t: Tree[Int]): Int = t match {
 
 ### Exercise 3.27
 
-``` scala
-/*
 Again, note how similar the implementation is to `size` and `maximum`.
-*/
+
+``` scala
 def depth[A](t: Tree[A]): Int = t match {
   case Leaf(_) => 0
   case Branch(l,r) => 1 + (depth(l) max depth(r))
@@ -441,10 +414,14 @@ def map[A,B](t: Tree[A])(f: A => B): Tree[B] = t match {
 
 ### Exercise 3.29
 
-``` scala
-/* 
+``` scala 
+def mapViaFold[A,B](t: Tree[A])(f: A => B): Tree[B] = 
+  fold(t)(a => Leaf(f(a)): Tree[B])(Branch(_,_))
+```
+
 Like `foldRight` for lists, `fold` receives a "handler" for each of the data constructors of the type, and recursively accumulates some value using these handlers. As with `foldRight`, `fold(t)(Leaf(_))(Branch(_,_)) == t`, and we can use this function to implement just about any recursive function that would otherwise be defined by pattern matching.
-*/
+
+``` scala
 def fold[A,B](t: Tree[A])(f: A => B)(g: (B,B) => B): B = t match {
   case Leaf(a) => f(a)
   case Branch(l,r) => g(fold(l)(f)(g), fold(r)(f)(g))
@@ -458,23 +435,23 @@ def maximumViaFold(t: Tree[Int]): Int =
 
 def depthViaFold[A](t: Tree[A]): Int = 
   fold(t)(a => 0)((d1,d2) => 1 + (d1 max d2))
+```
 
-/*
 Note the type annotation required on the expression `Leaf(f(a))`. Without this annotation, we get an error like this: 
 
+```
 type mismatch;
   found   : fpinscala.datastructures.Branch[B]
   required: fpinscala.datastructures.Leaf[B]
      fold(t)(a => Leaf(f(a)))(Branch(_,_))
                                     ^  
+```
 
 This error is an unfortunate consequence of Scala using subtyping to encode algebraic data types. Without the annotation, the result type of the fold gets inferred as `Leaf[B]` and it is then expected that the second argument to `fold` will return `Leaf[B]`, which it doesn't (it returns `Branch[B]`). Really, we'd prefer Scala to infer `Tree[B]` as the result type in both cases. When working with algebraic data types in Scala, it's somewhat common to define helper functions that simply call the corresponding data constructors but give the less specific result type:  
-  
-  def leaf[A](a: A): Tree[A] = Leaf(a)
-  def branch[A](l: Tree[A], r: Tree[A]): Tree[A] = Branch(l, r)
-*/
-def mapViaFold[A,B](t: Tree[A])(f: A => B): Tree[B] = 
-  fold(t)(a => Leaf(f(a)): Tree[B])(Branch(_,_))
+ 
+``` scala
+def leaf[A](a: A): Tree[A] = Leaf(a)
+def branch[A](l: Tree[A], r: Tree[A]): Tree[A] = Branch(l, r)
 ```
 
 ## Answers to exercises for chapter 4
@@ -537,27 +514,28 @@ def variance(xs: Seq[Double]): Option[Double] =
 
 ### Exercise 4.03
 
+A bit later in the chapter we'll learn nicer syntax for writing functions like this.
+
 ``` scala
-// a bit later in the chapter we'll learn nicer syntax for 
-// writing functions like this
 def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
   a flatMap (aa => b map (bb => f(aa, bb)))
 ```
 
 ### Exercise 4.04
 
-``` scala
-/*
 Here's an explicit recursive version:
-*/
+
+``` scala
 def sequence[A](a: List[Option[A]]): Option[List[A]] =
   a match {
     case Nil => Some(Nil)
     case h :: t => h flatMap (hh => sequence(t) map (hh :: _))
   }
-/*
+```
+
 It can also be implemented using `foldRight` and `map2`. The type annotation on `foldRight` is needed here; otherwise Scala wrongly infers the result type of the fold as `Some[Nil.type]` and reports a type error (try it!). This is an unfortunate consequence of Scala using subtyping to encode algebraic data types.
-*/
+
+``` scala
 def sequence_1[A](a: List[Option[A]]): Option[List[A]] =
   a.foldRight[Option[List[A]]](Some(Nil))((x,y) => map2(x,y)(_ :: _))
 ```
@@ -620,19 +598,17 @@ def sequence[E,A](es: List[Either[E,A]]): Either[E,List[A]] =
 
 ### Exercise 4.08
 
-``` scala
-/*
 There are a number of variations on `Option` and `Either`. If we want to accumulate multiple errors, a simple approach is a new data type that lets us keep a list of errors in the data constructor that represents failures:
 
+``` scala
 trait Partial[+A,+B]
 case class Errors[+A](get: Seq[A]) extends Partial[A,Nothing]
 case class Success[+B](get: B) extends Partial[Nothing,B]
+```
 
 There is a type very similar to this called `Validation` in the Scalaz library. You can implement `map`, `map2`, `sequence`, and so on for this type in such a way that errors are accumulated when possible (`flatMap` is unable to accumulate errors--can you see why?). This idea can even be generalized further--we don't need to accumulate failing values into a list; we can accumulate values using any user-supplied binary function. 
 
 It's also possible to use `Either[List[E],_]` directly to accumulate errors, using different implementations of helper functions like `map2` and `sequence`.
-*/
-```
 
 ## Answers to exercises for chapter 5
 
@@ -644,15 +620,15 @@ def toListRecursive: List[A] = this match {
   case Cons(h,t) => h() :: t().toListRecursive
   case _ => List()
 }
+```
 
-/*
 The above solution will stack overflow for large streams, since it's
 not tail-recursive. Here is a tail-recursive implementation. At each
 step we cons onto the front of the `acc` list, which will result in the
 reverse of the stream. Then at the end we reverse the result to get the
 correct order again.
-[:ben] are the line breaks above okay? I'm unclear on whether these "hints" are supposed to go in the book or not
-*/
+
+``` scala
 def toList: List[A] = {
   @annotation.tailrec
   def go(s: Stream[A], acc: List[A]): List[A] = s match {
@@ -661,13 +637,14 @@ def toList: List[A] = {
   }
   go(this, List()).reverse
 }
+```
 
-/* 
 In order to avoid the `reverse` at the end, we could write it using a
 mutable list buffer and an explicit loop instead. Note that the mutable
 list buffer never escapes our `toList` method, so this function is
 still _pure_.
-*/
+
+``` scala
 def toListFast: List[A] = {
   val buf = new collection.mutable.ListBuffer[A] 
   @annotation.tailrec
@@ -683,37 +660,32 @@ def toListFast: List[A] = {
 
 ### Exercise 5.02
 
-``` scala
-
-/*
 `take` first checks if n==0. In that case we need not look at the stream at all.
-*/
+
+``` scala
 def take(n: Int): Stream[A] = this match {
   case Cons(h, t) if n > 1 => cons(h(), t().take(n - 1))
   case Cons(h, _) if n == 1 => cons(h(), empty)
   case _ => empty
 }
+```
 
-
-/*
 Unlike `take`, `drop` is not incremental. That is, it doesn't generate the
 answer lazily. It must traverse the first `n` elements of the stream eagerly.
-*/
+
+``` scala
 @annotation.tailrec
 final def drop(n: Int): Stream[A] = this match {
   case Cons(_, t) if n > 0 => t().drop(n - 1)
   case _ => this
 }
-
-
 ```
 
 ### Exercise 5.03
 
-``` scala
-/*
 It's a common Scala style to write method calls without `.` notation, as in `t() takeWhile f`.  
-*/
+
+``` scala
 def takeWhile(f: A => Boolean): Stream[A] = this match { 
   case Cons(h,t) if f(h()) => cons(h(), t() takeWhile f)
   case _ => empty 
@@ -722,10 +694,9 @@ def takeWhile(f: A => Boolean): Stream[A] = this match {
 
 ### Exercise 5.04
 
-``` scala
-/* 
 Since `&&` is non-strict in its second argument, this terminates the traversal as soon as a nonmatching element is found. 
-*/
+
+``` scala
 def forAll(f: A => Boolean): Boolean =
   foldRight(true)((a,b) => f(a) && b)
 ```
@@ -804,10 +775,9 @@ def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
 
 ### Exercise 5.12
 
-``` scala
-/*
 Scala provides shorter syntax when the first action of a function literal is to match on an expression.  The function passed to `unfold` in `fibsViaUnfold` is equivalent to `p => p match { case (f0,f1) => ... }`, but we avoid having to choose a name for `p`, only to pattern match on it.
-*/
+
+``` scala
 val fibsViaUnfold = 
   unfold((0,1)) { case (f0,f1) => Some((f0,(f1,f0+f1))) }
 
@@ -870,10 +840,9 @@ def zipWithAll[B, C](s2: Stream[B])(f: (Option[A], Option[B]) => C): Stream[C] =
 
 ### Exercise 5.14
 
-``` scala
-/* 
 `s startsWith s2` when corresponding elements of `s` and `s2` are all equal, until the point that `s2` is exhausted. If `s` is exhausted first, or we find an element that doesn't match, we terminate early. Using non-strictness, we can compose these three separate logical steps--the zipping, the termination when the second stream is exhausted, and the termination if a nonmatching element is found or the first stream is exhausted.
-*/
+
+``` scala
 def startsWith[A](s: Stream[A]): Boolean = 
   zipAll(s).takeWhile(!_._2.isEmpty) forAll {
     case (h,h2) => h == h2
@@ -882,10 +851,9 @@ def startsWith[A](s: Stream[A]): Boolean =
 
 ### Exercise 5.15
 
-``` scala
-/*
 The last element of `tails` is always the empty `Stream`, so we handle this as a special case, by appending it to the output.
-*/
+
+``` scala
 def tails: Stream[Stream[A]] =
   unfold(this) {
     case Empty => None
@@ -1255,14 +1223,9 @@ def parFilter[A](l: List[A])(f: A => Boolean): Par[List[A]] = {
 
 ### Exercise 7.07
 
-``` scala
-/* 
 See https://github.com/quchen/articles/blob/master/second_functor_law.md
 
 Also https://gist.github.com/pchiusano/444de1f222f1ceb09596
-*/
-
-```
 
 ### Exercise 7.08
 
@@ -1270,11 +1233,7 @@ Keep reading. The issue is explained in the next paragraph.
 
 ### Exercise 7.09
 
-``` scala
-/* 
 For a thread pool of size 2, `fork(fork(fork(x)))` will deadlock, and so on. Another, perhaps more interesting example is `fork(map2(fork(x), fork(y)))`. In this case, the outer task is submitted first and occupies a thread waiting for both `fork(x)` and `fork(y)`. The `fork(x)` and `fork(y)` tasks are submitted and run in parallel, except that only one thread is available, resulting in deadlock. 
-*/
-```
 
 ### Exercise 7.10
 
@@ -1374,10 +1333,9 @@ def zip[B](p2: Par[B]): Par[(A,B)] =
 
 ### Exercise 7.17
 
-``` scala
-/* 
 This implementation is not safe for execution on bounded thread pools, and it also does not preserve timeouts. Can you see why? You may wish to try implementing a nonblocking version like was done for `fork`.  
-*/
+
+``` scala
 def join[A](a: Par[Par[A]]): Par[A] = 
   es => a(es).get.apply(es)
 
@@ -1450,19 +1408,19 @@ def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] =
 
 ### Exercise 8.06
 
-``` scala
 These methods are defined in the `Gen` class:
 
-  def flatMap[B](f: A => Gen[B]): Gen[B] =
-    Gen(sample.flatMap(a => f(a).sample))
-  
-  /* A method alias for the function we wrote earlier. */
-  def listOfN(size: Int): Gen[List[A]] =
-    Gen.listOfN(size, this)
-  
-  /* A version of `listOfN` that generates the size to use dynamically. */
-  def listOfN(size: Gen[Int]): Gen[List[A]] =
-    size flatMap (n => this.listOfN(n))
+``` scala
+def flatMap[B](f: A => Gen[B]): Gen[B] =
+  Gen(sample.flatMap(a => f(a).sample))
+
+/* A method alias for the function we wrote earlier. */
+def listOfN(size: Int): Gen[List[A]] =
+  Gen.listOfN(size, this)
+
+/* A version of `listOfN` that generates the size to use dynamically. */
+def listOfN(size: Gen[Int]): Gen[List[A]] =
+  size flatMap (n => this.listOfN(n))
 ```
 
 ### Exercise 8.07
@@ -1574,10 +1532,7 @@ val sortedProp = forAll(listOf(smallInt)) { ns =>
 
 ### Exercise 8.15
 
-``` scala
-/* A detailed answer is to be found in the file Exhaustive.scala in the code
-   accompanying this chapter. */
-```
+A detailed answer is to be found in the file Exhaustive.scala in the code accompanying this chapter.
 
 ### Exercise 8.16
 
@@ -1643,8 +1598,6 @@ For instance, if `a` and `b` were both `Parser[String]`, and `f` and `g` both co
 
 See chapter 12 for more discussion of these laws.
 
-```
-
 ### Exercise 9.03
 
 ``` scala
@@ -1665,24 +1618,26 @@ def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] =
 
 ### Exercise 9.05
 
+We could introduce a combinator, `wrap`:
+
 ``` scala
-// We could introduce a combinator, `wrap`:
+def wrap[A](p: => Parser[A]): Parser[A]
+```  
 
-  def wrap[A](p: => Parser[A]): Parser[A]
+Then define `many` as:
 
-// Then define `many` as:
-
-  def many[A](p: Parser[A]): Parser[List[A]] =
-    map2(p, wrap(many(p)))(_ :: _) or succeed(List())
-
-// In the parallelism chapter, we were particularly interested in avoiding having `Par` objects that took as much time and space to build as the corresponding serial computation, and the `delay` combinator let us control this more carefully. Here, this isn't as much of a concern, and having to think carefully each time we `map2` to decide whether we need to call `wrap` seems like unnecessary friction for users of the API.
-
+``` scala
+def many[A](p: Parser[A]): Parser[List[A]] =
+  map2(p, wrap(many(p)))(_ :: _) or succeed(List())
 ```
+
+In the parallelism chapter, we were particularly interested in avoiding having `Par` objects that took as much time and space to build as the corresponding serial computation, and the `delay` combinator let us control this more carefully. Here, this isn't as much of a concern, and having to think carefully each time we `map2` to decide whether we need to call `wrap` seems like unnecessary friction for users of the API.
 
 ### Exercise 9.06
 
+We'll just have this parser return the number of `'a'` characters read. Note that we can declare a normal value inside a for-comprehension.
+
 ``` scala
-/* We'll just have this parser return the number of `"a"` characters read. Note that we can declare a normal value inside a for-comprehension. */
 for {
   digit <- "[0-9]+".r
   val n = digit.toInt // we really should catch exceptions thrown by toInt and convert to parse failure
@@ -1692,10 +1647,9 @@ for {
 
 ### Exercise 9.07
 
-``` scala
-/* 
 These can be implemented using a for-comprehension, which delegates to the `flatMap` and `map` implementations we've provided on `ParserOps`, or they can be implemented in terms of these functions directly. 
-*/
+
+``` scala
 def product[A,B](p: Parser[A], p2: => Parser[B]): Parser[(A,B)] = 
   flatMap(p)(a => map(p2)(b => (a,b)))
 
@@ -1734,24 +1688,15 @@ Keep reading for a discussion
 
 ### Exercise 9.13
 
-``` scala
 There is a completed reference implementation of `Parsers` in `parsing/instances/Reference.scala`, though we recommend you continue reading before looking at that, since we're still refining the representation.
-
-```
 
 ### Exercise 9.14
 
-``` scala
 Again, see `parsing/instances/Reference.scala` for a fully worked implementation.
-
-```
 
 ### Exercise 9.15
 
-``` scala
 Again see reference implementation here https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala
-
-```
 
 ### Exercise 9.16
 
@@ -1809,10 +1754,7 @@ case class ParseError(stack: List[(Location,String)] = List()) {
 
 ### Exercise 9.17
 
-``` scala
 See a fully worked implementation in `instances/Sliceable.scala` in the answers.
-
-```
 
 ### Exercise 9.18
 
@@ -1897,10 +1839,11 @@ def lastOptionMonoid[A]: Monoid[Option[A]] = dual(firstOptionMonoid)
 
 ### Exercise 10.03
 
+There is a choice of implementation here as well.
+Do we implement it as `f compose g` or `f andThen g`? We have to pick one.
+We can then get the other one using the `dual` construct (see previous answer).
+
 ``` scala
-// There is a choice of implementation here as well.
-// Do we implement it as `f compose g` or `f andThen g`? We have to pick one.
-// We can then get the other one using the `dual` construct (see previous answer).
 def endoMonoid[A]: Monoid[A => A] = new Monoid[A => A] {
   def op(f: A => A, g: A => A) = f compose g
   val zero = (a: A) => a
@@ -1928,8 +1871,9 @@ def monoidLaws[A](m: Monoid[A], gen: Gen[A]): Prop =
 
 ### Exercise 10.05
 
+Notice that this function does not require the use of `map` at all.
+
 ``` scala
-// Notice that this function does not require the use of `map` at all.
 def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B =
   as.foldLeft(m.zero)((b, a) => m.op(b, f(a)))
 ```
@@ -2109,14 +2053,14 @@ object TreeFoldable extends Foldable[Tree] {
     case Branch(l, r) => foldRight(l)(foldRight(r)(z)(f))(f)
   }
 }
-
-// Notice that in `TreeFoldable.foldMap`, we don't actually use the `zero`
-// from the `Monoid`. This is because there is no empty tree.
-// This suggests that there might be a class of types that are foldable
-// with something "smaller" than a monoid, consisting only of an
-// associative `op`. That kind of object (a monoid without a `zero`) is
-// called a semigroup.
 ```
+
+Notice that in `TreeFoldable.foldMap`, we don't actually use the `zero`
+from the `Monoid`. This is because there is no empty tree.
+This suggests that there might be a class of types that are foldable
+with something "smaller" than a monoid, consisting only of an
+associative `op`. That kind of object (a monoid without a `zero`) is
+called a *semigroup*.
 
 ### Exercise 10.14
 
@@ -2217,12 +2161,13 @@ val listMonad = new Monad[List] {
 
 ### Exercise 11.02
 
+Since `State` is a binary type constructor, we need to partially apply it
+with the `S` type argument. Thus, it is not just one monad, but an entire
+family of monads, one for each type `S`. One solution is to create a class
+`StateMonads` that accepts the `S` type argument and then has a _type member_
+for the fully applied `State[S, A]` type inside:
+
 ``` scala
-// Since `State` is a binary type constructor, we need to partially apply it
-// with the `S` type argument. Thus, it is not just one monad, but an entire
-// family of monads, one for each type `S`. One solution is to create a class
-// `StateMonads` that accepts the `S` type argument and then has a _type member_
-// for the fully applied `State[S, A]` type inside:
 class StateMonads[S] {
   type StateS[A] = State[S, A]
 
@@ -2233,11 +2178,14 @@ class StateMonads[S] {
       st flatMap f
   }
 }
+```
 
-// But we don't have to create a full class like `StateMonads`. We can create
-// an anonymous class inline, inside parentheses, and project out its type member `f`.
-// This is sometimes called a "type lambda", since it's very similar to a type-level
-// anonymous function.
+But we don't have to create a full class like `StateMonads`. We can create
+an anonymous class inline, inside parentheses, and project out its type member `f`.
+This is sometimes called a "type lambda", since it's very similar to a type-level
+anonymous function.
+
+``` scala
 def stateMonad[S] = new Monad[({type f[x] = State[S, x]})#f] {
   def unit[A](a: => A): State[S, A] = State(s => (a, s))
   override def flatMap[A,B](st: State[S, A])(f: A => State[S, B]): State[S, B] =
@@ -2284,19 +2232,14 @@ def replicateM[A](n: Int, ma: F[A]): F[List[A]] =
 
 ### Exercise 11.05
 
-``` scala
 For `List`, the `replicateM` function will generate a list of lists. It will contain all the lists of length `n` with elements selected from the input list.
 
 For `Option`, it will generate either `Some` or `None` based on whether the input is `Some` or `None`. The `Some` case will contain a list of length `n` that repeats the element in the input `Option`.
 
 The general meaning of `replicateM` is described well by the implementation `sequence(List.fill(n)(ma))`. It repeats the `ma` monadic value `n` times and gathers the results in a single value, where the monad `F` determines how values are actually combined.
-```
 
 ### Exercise 11.06
 
-``` scala
-
-/*
 For `Par`, `filterM` filters a list, applying the functions in
 parallel; for `Option`, it filters a list, but allows
 the filtering function to fail and abort the filter
@@ -2304,7 +2247,8 @@ computation; for `Gen`, it produces a generator for
 subsets of the input list, where the function `f` picks a 
 'weight' for each element (in the form of a
 `Gen[Boolean]`)
-*/
+
+``` scala
 def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] =
   ms match {
     case Nil => unit(Nil)
@@ -2331,35 +2275,41 @@ def flatMap[A,B](ma: F[A])(f: A => F[B]): F[B] =
 
 ### Exercise 11.09
 
-``` scala
 Let's rewrite the following in terms of `flatMap`:
 
+``` scala
 compose(compose(f, g), h) == compose(f, compose(g, h))
 
 a => flatMap(compose(f, g)(a))(h) == a => flatMap(f(a))(compose(g, h))
 a => flatMap((b => flatMap(f(b))(g))(a))(h) == a => flatMap(f(a))(b => flatMap(g(b))(h))
+```
 
 So far we have just expanded the definition of `compose`. Equals substituted for equals.
 Let's simplify the left side a little:
 
+``` scala
 a => flatMap(flatMap(f(a))(g))(h) == a => flatMap(f(a))(b => flatMap(g(b))(h))
+```
 
 Let's simplify again by eliminating the `a` argument and substituting a hypothetical value `x` for `f(a)`:
 
+``` scala
 flatMap(flatMap(x)(g))(h) == flatMap(x)(b => flatMap(g(b))(h))
+```
 
 This now looks exactly like the monad law stated in terms of `flatMap`, just with different names:
 
+``` scala
 flatMap(flatMap(x)(f))(g) == flatMap(x)(a => flatMap(f(a))(g))
+```
 
 Q.E.D.
-```
 
 ### Exercise 11.10
 
-``` scala
-// We simply substitute the definition of `compose` in terms of `flatMap`.
+We simply substitute the definition of `compose` in terms of `flatMap`.
 
+``` scala
 compose(f, unit)(v) == f(v)           // for all functions f and values v
 (a => flatMap(f(a))(unit))(v) == f(v) // Expand `compose`
 flatMap(f(v))(unit) == f(v)           // Simplify function application
@@ -2367,16 +2317,16 @@ flatMap(x)(unit) == x                 // Abstract out `f(v)`
 
 compose(unit, f)(x) == f(x)
 flatMap(unit(x))(f) == f(x) // Expand `compose`
+```
 
 Q.E.D.
-```
 
 ### Exercise 11.11
 
-``` scala
 For `Option`, we again consider both cases `None` and `Some` and expand the equation.
 The monadic `unit` is the `Some(_)` constructor.
 
+``` scala
 // Left identity is trivially true for None:
 flatMap(None)(Some(_)) == None
 
@@ -2415,79 +2365,96 @@ def compose[A,B,C](f: A => F[B], g: B => F[C]): A => F[C] =
 
 ### Exercise 11.14
 
-``` scala
 We can look at the associative law in terms of `flatMap` from another perspective. It says that `x.flatMap(f).flatMap(g)` is equal to `x.flatMap(a => f(a).flatMap(g))` _for all_ choices of `f` and `g`. So let's pick a particular `f` and `g` that's easy to think about. We can just pick the identity function:
 
+``` scala
 x.flatMap(z => z).flatMap(z => z) == x.flatMap(a => a.flatMap(z => z))
+```
 
 And of course, flatMapping with the identify function is `join`! The associative law can now be stated as:
 
+``` scala
 join(join(x)) == x.flatMap(join)
+```
 
 And we know that `flatMap` is "map, then join," so let's eliminate this last call to `flatMap`:
 
+``` scala
 join(join(x)) == join(map(x)(join))
+```
 
 The identity laws in terms of `join` are:
 
+``` scala
 join(map(x)(unit)) == x
 join(unit(x)) == x
+```
 
 This follows from the definition of `join` and the identity laws in terms of `flatMap`:
 
+``` scala
 flatMap(x)(unit) == x
 flatMap(unit(x))(f) == f(x)
+```
 
 For the second law, we simply substitute the identity function for `f`, which gives us `join`.
 
 Let's make a fast-and-loose proof for this version of the associative law using the `List` monad as an example. Of course, `join` in the `List` monad is just _list concatenation_:
 
+```
 scala> listMonad.join(List(List(1, 2), List(3, 4)))
 res0: List[Int] = List(1, 2, 3, 4)
+```
 
 Now let's say we have some lists, nested to a depth of three:
 
+``` scala
 val ns: List[List[List[Int]]] =
   List(List(List(1,2), List(3,4)),
        List(List(), List(5)))
+```
 
 If we `join` this list, the outer lists get concatenated and we have a list of lists two levels deep:
 
+```
 scala> ns.flatten
 res1: List[List[Int]] = List(List(1, 2), List(3, 4), List(), List(5))
+```
 
 If we instead _map_ `join` over it, we get a different nesting but again two levels deep. This flattens the _inner_ lists.
 
+```
 scala> ns.map(listMonad.join)
 res2: List[List[Int]] = List(List(1, 2, 3, 4), List(5))
+```
 
 And then joining `res1` should be the same as joining `res2`:
 
+```
 scala> listMonad.join(res1) == listMonad.join(res2)
 res3: Boolean = true
+```
 
 So all that the associative law is saying for the `List` monad is that concatenating the outer lists and then the inner ones (`join(join(ns))`) is the same as first concatenating the inner lists and then the outer ones (`join(ns.map(join))`).
-```
 
 ### Exercise 11.15
 
-``` scala
 We can state the associative law in terms of `join`:
 
+``` scala
 join(join(x)) == join(map(x)(join))
+```
 
 For `Par`, the `join` combinator means something like "make the outer thread wait for the inner one to finish." What this law is saying is that if you have threads starting threads three levels deep, then joining the inner threads and then the outer ones is the same as joining the outer threads and then the inner ones.
 
 For `Parser`, the `join` combinator is running the outer parser to produce a `Parser`, then running the inner `Parser` _on the remaining input_. The associative law is saying, roughly, that only the _order_ of nesting matters, since that's what affects the order in which the parsers are run.
-```
 
 ### Exercise 11.16
 
-``` scala
 Recall the identity laws:
 
-left identity:  flatMap(unit(x))(f) == f(x)
-right identity: flatMap(x)(unit)    == x
+left identity:  `flatMap(unit(x))(f) == f(x)`
+right identity: `flatMap(x)(unit)    == x`
 
 The left identity law for `Gen`:
 The law states that if you take the values generated by `unit(x)` (which are always `x`) and apply `f` to those values, that's exactly the same as the generator returned by `f(x)`.
@@ -2500,7 +2467,6 @@ The law says that wrapping a list in a singleton `List` and then flattening the 
 
 The right identity law for `List`:
 The law says that if you take every value in a list, wrap each one in a singleton `List`, and then flatten the result, you get the list you started with.
-```
 
 ### Exercise 11.17
 
@@ -2520,13 +2486,11 @@ object Id {
 
 ### Exercise 11.18
 
-``` scala
 `replicateM` for `State` repeats the same state transition a number of times and returns a list of the results. It's not passing the same starting state many times, but chaining the calls together so that the output state of one is the input state of the next.
 
 `map2` works similarly in that it takes two state transitions and feeds the output state of one to the input of the other. The outputs are not put in a list, but combined with a function `f`.
 
 `sequence` takes an entire list of state transitions and does the same kind of thing as `replicateM`: it feeds the output state of the first state transition to the input state of the next, and so on. The results are accumulated in a list.
-```
 
 ### Exercise 11.19
 
@@ -2563,25 +2527,25 @@ object Reader {
   // A primitive operation for it would be simply to ask for the `R` argument:
   def ask[R]: Reader[R, R] = Reader(r => r)
 }
-
-// The action of Reader's `flatMap` is to pass the `r` argument along to both the
-// outer Reader and also to the result of `f`, the inner Reader. Similar to how
-// `State` passes along a state, except that in `Reader` the "state" is read-only.
-
-// The meaning of `sequence` here is that if you have a list of functions, you can
-// turn it into a function that takes one argument and passes it to all the functions
-// in the list, returning a list of the results.
-
-// The meaning of `join` is simply to pass the same value as both arguments to a
-// binary function.
-
-// The meaning of `replicateM` is to apply the same function a number of times to
-// the same argument, returning a list of the results. Note that if this function
-// is _pure_, (which it should be), this can be exploited by only applying the
-// function once and replicating the result instead of calling the function many times.
-// This means the Reader monad can override replicateM to provide a very efficient
-// implementation.
 ```
+
+The action of Reader's `flatMap` is to pass the `r` argument along to both the
+outer Reader and also to the result of `f`, the inner Reader. Similar to how
+`State` passes along a state, except that in `Reader` the "state" is read-only.
+
+The meaning of `sequence` here is that if you have a list of functions, you can
+turn it into a function that takes one argument and passes it to all the functions
+in the list, returning a list of the results.
+
+The meaning of `join` is simply to pass the same value as both arguments to a
+binary function.
+
+The meaning of `replicateM` is to apply the same function a number of times to
+the same argument, returning a list of the results. Note that if this function
+is _pure_, (which it should be), this can be exploited by only applying the
+function once and replicating the result instead of calling the function many times.
+This means the Reader monad can override replicateM to provide a very efficient
+implementation.
 
 ## Answers to exercises for chapter 12
 
@@ -2650,9 +2614,7 @@ def map4[A,B,C,D,E](fa: F[A],
 
 ### Exercise 12.04
 
-``` scala
 This transposes the list! That is, we start with a list of rows, each of which is possibly infinite in length. We get back a single row, where each element is the column of values at that position. Try it yourself in the REPL.
-```
 
 ### Exercise 12.05
 
@@ -2686,7 +2648,6 @@ def validationApplicative[E]: Applicative[({type f[x] = Validation[E,x]})#f] =
 
 ### Exercise 12.07
 
-``` scala
 We'll just work through left and right identity, but the basic idea for all these proofs is to substitute the definition of all functions, then use the monad laws to make simplifications to the applicative identities. 
 
 Let's start with left and right identity:
@@ -2727,7 +2688,6 @@ Right identity is symmetric; we just end up using the other identity for `compos
     fa == fa
 
 Associativity and naturality are left as an exercise.
-```
 
 ### Exercise 12.08
 
@@ -2757,22 +2717,20 @@ def compose[G[_]](G: Applicative[G]): Applicative[({type f[x] = F[G[x]]})#f] = {
 
 ### Exercise 12.10
 
-``` scala
-// If `self` and `G` both satisfy the laws, then so does the composite.
-// The full proof of the laws can be found at:
-// https://github.com/runarorama/sannanir/blob/master/Applicative.v
-```
+If `self` and `G` both satisfy the laws, then so does the composite.
+The full proof of the laws can be found at:
+https://github.com/runarorama/sannanir/blob/master/Applicative.v
 
 ### Exercise 12.11
 
-``` scala
 You want to try writing `flatMap` in terms of `Monad[F]` and `Monad[G]`.
 
+``` scala
 def flatMap[A,B](mna: F[G[A]])(f: A => F[G[B]]): F[G[B]] =
   self.flatMap(na => G.flatMap(na)(a => ???))
-
-Here all you have is `f`, which returns an `F[G[B]]`. For it to have the appropriate type to return from the argument to `G.flatMap`, you'd need to be able to "swap" the `F` and `G` types. In other words, you'd need a _distributive law_. Such an operation is not part of the `Monad` interface.
 ```
+
+Here all you have is `f`, which returns an `F[G[B]]`. For it to have the appropriate type to return from the argument to `G.flatMap`, you'd need to be able to "swap" the `F` and `G` types. In other words, you'd need a *distributive law*. Such an operation is not part of the `Monad` interface.
 
 ### Exercise 12.12
 
@@ -2808,7 +2766,6 @@ val treeTraverse = new Traverse[Tree] {
 
 ### Exercise 12.14
 
-``` scala
 The simplest possible `Applicative` we can use is `Id`:
 
     type Id[A] = A
@@ -2837,24 +2794,23 @@ Note that we can define `traverse` in terms of `sequence` and `map`, which means
       def map[A,B](fa: F[A])(f: A => B): F[B] =
         traverse[Id, A, B](fa)(f)(idMonad)
     }
-```
 
 ### Exercise 12.15
 
-``` scala
 It's because `foldRight`, `foldLeft`, and `foldMap` don't give us any way of constructing a value of the foldable type. In order to `map` over a structure, you need the ability to create a new structure (such as `Nil` and `Cons` in the case of a `List`). `Traverse` is able to extend `Functor` precisely because a traversal preserves the original structure. 
 An example of a Foldable that is not a functor:
 
-    case class Iteration[A](a: A, f: A => A, n: Int) {
-      def foldMap[B](g: A => B)(M: Monoid[B]): B = {
-        def iterate(n: Int, b: B, c: A): B =
-          if (n <= 0) b else iterate(n-1, g(c), f(a))
-        iterate(n, M.zero, a)
-      }
-    }
+``` scala
+case class Iteration[A](a: A, f: A => A, n: Int) {
+  def foldMap[B](g: A => B)(M: Monoid[B]): B = {
+    def iterate(n: Int, b: B, c: A): B =
+      if (n <= 0) b else iterate(n-1, g(c), f(a))
+    iterate(n, M.zero, a)
+  }
+}
+```
 
 This class conceptually represents a sequence of `A` values, generated by repeated function application starting from some seed value. But can you see why it's not possible to define `map` for this type?
-```
 
 ### Exercise 12.16
 
@@ -2905,93 +2861,87 @@ def composeM[G[_],H[_]](implicit G: Monad[G], H: Monad[H], T: Traverse[H]):
 ### Exercise 13.01
 
 ``` scala
-  def freeMonad[F[_]]: Monad[({type f[a] = Free[F,a]})#f] =
-    new Monad[({type f[a] = Free[F,a]})#f] {
-      def unit[A](a: => A) = Return(a)
-      def flatMap[A,B](fa: Free[F, A])(f: A => Free[F, B]) = fa flatMap f
-    }
-
+def freeMonad[F[_]]: Monad[({type f[a] = Free[F,a]})#f] =
+  new Monad[({type f[a] = Free[F,a]})#f] {
+    def unit[A](a: => A) = Return(a)
+    def flatMap[A,B](fa: Free[F, A])(f: A => Free[F, B]) = fa flatMap f
+  }
 ```
 
 ### Exercise 13.02
 
 ``` scala
-  @annotation.tailrec
-  def runTrampoline[A](a: Free[Function0,A]): A = (a) match {
-    case Return(a) => a
-    case Suspend(r) => r()
-    case FlatMap(x,f) => x match {
-      case Return(a) => runTrampoline { f(a) }
-      case Suspend(r) => runTrampoline { f(r()) }
-      case FlatMap(a0,g) => runTrampoline { a0 flatMap { a0 => g(a0) flatMap f } }
-    }
+@annotation.tailrec
+def runTrampoline[A](a: Free[Function0,A]): A = (a) match {
+  case Return(a) => a
+  case Suspend(r) => r()
+  case FlatMap(x,f) => x match {
+    case Return(a) => runTrampoline { f(a) }
+    case Suspend(r) => runTrampoline { f(r()) }
+    case FlatMap(a0,g) => runTrampoline { a0 flatMap { a0 => g(a0) flatMap f } }
   }
-
+}
 ```
 
 ### Exercise 13.03
 
 ``` scala
-  // Exercise 3: Implement a `Free` interpreter which works for any `Monad`
-  def run[F[_],A](a: Free[F,A])(implicit F: Monad[F]): F[A] = step(a) match {
-    case Return(a) => F.unit(a)
-    case Suspend(r) => r
-    case FlatMap(Suspend(r), f) => F.flatMap(r)(a => run(f(a)))
-    case _ => sys.error("Impossible, since `step` eliminates these cases")
-  }
-
+// Exercise 3: Implement a `Free` interpreter which works for any `Monad`
+def run[F[_],A](a: Free[F,A])(implicit F: Monad[F]): F[A] = step(a) match {
+  case Return(a) => F.unit(a)
+  case Suspend(r) => r
+  case FlatMap(Suspend(r), f) => F.flatMap(r)(a => run(f(a)))
+  case _ => sys.error("Impossible, since `step` eliminates these cases")
+}
 ```
 
 ### Exercise 13.04
 
 ``` scala
-  def translate[F[_],G[_],A](f: Free[F,A])(fg: F ~> G): Free[G,A] = {
-    type FreeG[A] = Free[G,A]
-    val t = new (F ~> FreeG) {
-      def apply[A](a: F[A]): Free[G,A] = Suspend { fg(a) }
-    }
-    runFree(f)(t)(freeMonad[G])
+def translate[F[_],G[_],A](f: Free[F,A])(fg: F ~> G): Free[G,A] = {
+  type FreeG[A] = Free[G,A]
+  val t = new (F ~> FreeG) {
+    def apply[A](a: F[A]): Free[G,A] = Suspend { fg(a) }
   }
+  runFree(f)(t)(freeMonad[G])
+}
 
-  def runConsole[A](a: Free[Console,A]): A =
-    runTrampoline { translate(a)(new (Console ~> Function0) {
-      def apply[A](c: Console[A]) = c.toThunk
-    })}
-
-
+def runConsole[A](a: Free[Console,A]): A =
+  runTrampoline { translate(a)(new (Console ~> Function0) {
+    def apply[A](c: Console[A]) = c.toThunk
+  })}
 ```
 
 ### Exercise 13.05
 
 ``` scala
-  /*
-   * Exercise 5: Implement a non-blocking read from an asynchronous file channel.
-   * We'll just give the basic idea - here, we construct a `Future`
-   * by reading from an `AsynchronousFileChannel`, a `java.nio` class
-   * which supports asynchronous reads.
-   */
+/*
+ * Exercise 5: Implement a non-blocking read from an asynchronous file channel.
+ * We'll just give the basic idea - here, we construct a `Future`
+ * by reading from an `AsynchronousFileChannel`, a `java.nio` class
+ * which supports asynchronous reads.
+ */
 
-  import java.nio._
-  import java.nio.channels._
+import java.nio._
+import java.nio.channels._
 
-  def read(file: AsynchronousFileChannel,
-           fromPosition: Long,
-           numBytes: Int): Par[Either[Throwable, Array[Byte]]] =
-    Par.async { (cb: Either[Throwable, Array[Byte]] => Unit) =>
-      val buf = ByteBuffer.allocate(numBytes)
-      file.read(buf, fromPosition, (), new CompletionHandler[Integer, Unit] {
-        def completed(bytesRead: Integer, ignore: Unit) = {
-          val arr = new Array[Byte](bytesRead)
-          buf.slice.get(arr, 0, bytesRead)
-          cb(Right(arr))
-        }
-        def failed(err: Throwable, ignore: Unit) =
-          cb(Left(err))
-      })
-    }
-  
-  // note: We can wrap `read` in `Free[Par,A]` using the `Suspend` constructor
+def read(file: AsynchronousFileChannel,
+         fromPosition: Long,
+         numBytes: Int): Par[Either[Throwable, Array[Byte]]] =
+  Par.async { (cb: Either[Throwable, Array[Byte]] => Unit) =>
+    val buf = ByteBuffer.allocate(numBytes)
+    file.read(buf, fromPosition, (), new CompletionHandler[Integer, Unit] {
+      def completed(bytesRead: Integer, ignore: Unit) = {
+        val arr = new Array[Byte](bytesRead)
+        buf.slice.get(arr, 0, bytesRead)
+        cb(Right(arr))
+      }
+      def failed(err: Throwable, ignore: Unit) =
+        cb(Left(err))
+    })
+  }
 
+// note: We can wrap `read` in `Free[Par,A]` using the `Suspend` constructor
 ```
 
 ## Answers to exercises for chapter 14
@@ -3212,13 +3162,6 @@ def feed[A,B](oa: Option[A])(p: Process[A,B]): Process[A,B] =
 
 ```
 
-### Exercise 15.07
-
-``` scala
-- 
-
-```
-
 ### Exercise 15.08
 
 ``` scala
@@ -3253,16 +3196,12 @@ def echo[I]: Process[I,I] = await(i => emit(i))
 
 ### Exercise 15.09
 
-``` scala
-/*
- * Exercise 9: Write a program that reads degrees fahrenheit as `Double` values from a file,
- * converts each temperature to celsius, and writes results to another file.
- */
+This process defines the here is core logic, a transducer that converts input lines
+(assumed to be temperatures in degrees fahrenheit) to output lines (temperatures in
+degress celsius). Left as an exercise to supply another wrapper like `processFile`
+to actually do the IO and drive the process.
 
-// This process defines the here is core logic, a transducer that converts input lines
-// (assumed to be temperatures in degrees fahrenheit) to output lines (temperatures in
-// degress celsius). Left as an exercise to supply another wrapper like `processFile`
-// to actually do the IO and drive the process.
+``` scala
 def convertFahrenheit: Process[String,String] =
   filter((line: String) => !line.startsWith("#")) |>
   filter(line => line.trim.nonEmpty) |>
@@ -3333,8 +3272,9 @@ def eval_[F[_],A,B](a: F[A]): Process[F,B] =
 
 ### Exercise 15.12
 
+Notice this is the standard monadic `join` combinator!
+
 ``` scala
-/* Exercise 12: Implement `join`. Notice this is the standard monadic combinator! */
 def join[F[_],A](p: Process[F,Process[F,A]]): Process[F,A] =
   p.flatMap(pa => pa)
 
