@@ -1,0 +1,3 @@
+notes.txt
+answers.txt
+haskell.txt
