@@ -200,7 +200,8 @@ def length2[A](l: List[A]): Int = foldLeft(l, 0)((acc,h) => acc + 1)
 ### Exercise 3.12
 
 ``` scala
-def reverse[A](l: List[A]): List[A] = foldLeft(l, List[A]())((acc,h) => Cons(h,acc))
+def reverse[A](l: List[A]): List[A] =
+  foldLeft(l, List[A]())((acc,h) => Cons(h,acc))
 ```
 
 ### Exercise 3.13
@@ -272,7 +273,8 @@ def map_2[A,B](l: List[A])(f: A => B): List[B] = {
     case Cons(h,t) => buf += f(h); go(t)
   }
   go(l)
-  List(buf.toList: _*) // converting from the standard Scala list to the list we've defined here
+  List(buf.toList: _*)
+  // converting from the standard Scala list to the list we've defined here
 }
 ```
 
@@ -295,7 +297,8 @@ def filter_2[A](l: List[A])(f: A => Boolean): List[A] = {
     case Cons(h,t) => if (f(h)) buf += h; go(t)
   }
   go(l)
-  List(buf.toList: _*) // converting from the standard Scala list to the list we've defined here
+  List(buf.toList: _*)
+  // converting from the standard Scala list to the list we've defined here
 }
 ```
 
@@ -335,11 +338,12 @@ def addPairwise(a: List[Int], b: List[Int]): List[Int] = (a,b) match {
 This function is usually called `zipWith`. The discussion about stack usage from the explanation of `map` also applies here. By putting the `f` in the second argument list, Scala can infer its type from the previous argument list. 
 
 ``` scala
-def zipWith[A,B,C](a: List[A], b: List[B])(f: (A,B) => C): List[C] = (a,b) match {
-  case (Nil, _) => Nil
-  case (_, Nil) => Nil
-  case (Cons(h1,t1), Cons(h2,t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
-}
+def zipWith[A,B,C](a: List[A], b: List[B])(f: (A,B) => C): List[C] =
+  (a,b) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1,t1), Cons(h2,t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
+  }
 ```
 
 ### Exercise 3.24
@@ -367,7 +371,6 @@ def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
   case _ if startsWith(sup, sub) => true
   case Cons(h,t) => hasSubsequence(t, sub)
 }
-
 ```
 
 ### Exercise 3.25
@@ -883,11 +886,12 @@ def scanRight[B](z: B)(f: (A, => B) => B): Stream[B] =
 
 ### Exercise 6.01
 
+We need to be quite careful not to skew the generator.
+Since `Int.Minvalue` is 1 smaller than `-(Int.MaxValue)`,
+it suffices to increment the negative numbers by 1 and make them positive.
+This maps Int.MinValue to Int.MaxValue and -1 to 0.
+
 ``` scala
-// We need to be quite careful not to skew the generator.
-// Since `Int.Minvalue` is 1 smaller than `-(Int.MaxValue)`,
-// it suffices to increment the negative numbers by 1 and make them positive.
-// This maps Int.MinValue to Int.MaxValue and -1 to 0.
 def nonNegativeInt(rng: RNG): (Int, RNG) = {
   val (i, r) = rng.nextInt
   (if (i < 0) -(i + 1) else i, r)
@@ -896,9 +900,10 @@ def nonNegativeInt(rng: RNG): (Int, RNG) = {
 
 ### Exercise 6.02
 
+We generate an integer >= 0 and divide it by one higher than the
+maximum. This is just one possible solution.
+
 ``` scala
-// We generate an integer >= 0 and divide it by one higher than the
-// maximum. This is just one possible solution.
 def double(rng: RNG): (Double, RNG) = {
   val (i, r) = nonNegativeInt(rng)
   (i / (Int.MaxValue.toDouble + 1), r)
@@ -925,11 +930,11 @@ def double3(rng: RNG): ((Double, Double, Double), RNG) = {
   val (d3, r3) = double(r2)
   ((d1, d2, d3), r3)
 }
-
-// There is something terribly repetitive about passing the RNG along
-// every time. What could we do to eliminate some of this duplication
-// of effort?
 ```
+
+There is something terribly repetitive about passing the RNG along
+every time. What could we do to eliminate some of this duplication
+of effort?
 
 ### Exercise 6.04
 
@@ -1074,15 +1079,17 @@ object State {
     State((s: S) => go(s,sas,List()))
   }
 
-  // We can also write the loop using a left fold. This is tail recursive like the
-  // previous solution, but it reverses the list _before_ folding it instead of after.
-  // You might think that this is slower than the `foldRight` solution since it
-  // walks over the list twice, but it's actually faster! The `foldRight` solution
-  // technically has to also walk the list twice, since it has to unravel the call
-  // stack, not being tail recursive. And the call stack will be as tall as the list
-  // is long.
+  // We can also write the loop using a left fold. This is tail recursive like 
+  // the previous solution, but it reverses the list _before_ folding it instead
+  // of after. You might think that this is slower than the `foldRight` solution
+  // since it walks over the list twice, but it's actually faster! The
+  // `foldRight` solution technically has to also walk the list twice, since it
+  // has to unravel the call stack, not being tail recursive. And the call stack
+  // will be as tall as the list is long.
   def sequenceViaFoldLeft[S,A](l: List[State[S, A]]): State[S, List[A]] =
-    l.reverse.foldLeft(unit[S, List[A]](List()))((acc, f) => f.map2(acc)( _ :: _ ))
+    l.reverse.foldLeft(unit[S, List[A]](List())) { 
+      (acc, f) => f.map2(acc)( _ :: _ )
+    }
 
   def modify[S](f: S => S): State[S, Unit] = for {
     s <- get // Gets the current state and assigns it to `s`.
@@ -1093,7 +1100,6 @@ object State {
 
   def set[S](s: S): State[S, Unit] = State(_ => ((), s))
 }
-
 ```
 
 ### Exercise 6.11
@@ -1145,7 +1151,10 @@ def map2[A,B,C](a: Par[A], b: Par[B])(f: (A,B) => C): Par[C] =
   }
 
 /*
-Note: this implementation will not prevent repeated evaluation if multiple threads call `get` in parallel. We could prevent this using synchronization, but it isn't needed for our purposes here (also, repeated evaluation of pure values won't affect results).
+Note: this implementation will not prevent repeated evaluation if multiple
+threads call `get` in parallel. We could prevent this using synchronization,
+but it isn't needed for our purposes here (also, repeated evaluation of pure
+values won't affect results).
 */
 case class Map2Future[A,B,C](a: Future[A], b: Future[B],
                              f: (A,B) => C) extends Future[C] {
@@ -1219,7 +1228,8 @@ def sequence[A](as: List[Par[A]]): Par[List[A]] =
 def parFilter[A](l: List[A])(f: A => Boolean): Par[List[A]] = {
   val pars: List[Par[List[A]]] = 
     l map (asyncF((a: A) => if (f(a)) List(a) else List())) 
-  map(sequence(pars))(_.flatten) // convenience method on `List` for concatenating a list of lists
+  // flatten is a convenience method on `List` for concatenating a list of lists
+  map(sequence(pars))(_.flatten)
 }
 ```
 
@@ -1649,7 +1659,9 @@ We'll just have this parser return the number of `'a'` characters read. Note tha
 ``` scala
 for {
   digit <- "[0-9]+".r
-  val n = digit.toInt // we really should catch exceptions thrown by toInt and convert to parse failure
+  val n = digit.toInt
+  // we really should catch exceptions thrown by toInt
+  // and convert to parse failure
   _ <- listOfN(n, char('a'))
 } yield n
 ```
@@ -1674,7 +1686,7 @@ def map[A,B](p: Parser[A])(f: A => B): Parser[B] = p.flatMap(a => succeed(f(a)))
 
 ### Exercise 9.09
 
-See full implementation in JSON.scala(https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/JSON.scala).
+See full implementation in [JSON.scala](https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/JSON.scala).
 
 ### Exercise 9.10
 
@@ -1683,7 +1695,10 @@ The next section works through a possible design in detail.
 ### Exercise 9.11
 
 ``` scala
-/** In the event of an error, returns the error that occurred after consuming the most number of characters. */
+/**
+ * In the event of an error, returns the error that occurred after consuming
+ * the most number of characters.
+ */
 def furthest[A](p: Parser[A]): Parser[A]
 
 /** In the event of an error, returns the error that occurred most recently. */
@@ -1705,7 +1720,7 @@ Again, see `parsing/instances/Reference.scala` for a fully worked implementation
 
 ### Exercise 9.15
 
-Again see reference implementation here https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala
+Again see reference implementation here: https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala
 
 ### Exercise 9.16
 
@@ -1744,8 +1759,9 @@ case class ParseError(stack: List[(Location,String)] = List()) {
       val context =
         collapsed.lastOption.map("\n\n" + _._1.currentLine).getOrElse("") +
         collapsed.lastOption.map("\n" + _._1.columnCaret).getOrElse("")
-      collapsed.map { case (loc,msg) => loc.line.toString + "." + loc.col + " " + msg }.mkString("\n") +
-      context
+      collapsed.map {
+        case (loc,msg) => loc.line.toString + "." + loc.col + " " + msg
+      }.mkString("\n") + context
     }
 
   /* Builds a collapsed version of the given error stack -
@@ -2055,10 +2071,11 @@ case class Leaf[A](value: A) extends Tree[A]
 case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
 
 object TreeFoldable extends Foldable[Tree] {
-  override def foldMap[A, B](as: Tree[A])(f: A => B)(mb: Monoid[B]): B = as match {
-    case Leaf(a) => f(a)
-    case Branch(l, r) => mb.op(foldMap(l)(f)(mb), foldMap(r)(f)(mb))
-  }
+  override def foldMap[A, B](as: Tree[A])(f: A => B)(mb: Monoid[B]): B =
+    as match {
+      case Leaf(a) => f(a)
+      case Branch(l, r) => mb.op(foldMap(l)(f)(mb), foldMap(r)(f)(mb))
+    }
   override def foldLeft[A, B](as: Tree[A])(z: B)(f: (B, A) => B) = as match {
     case Leaf(a) => f(z, a)
     case Branch(l, r) => foldLeft(r)(foldLeft(l)(z)(f))(f)
@@ -2296,7 +2313,9 @@ Let's rewrite the following in terms of `flatMap`:
 compose(compose(f, g), h) == compose(f, compose(g, h))
 
 a => flatMap(compose(f, g)(a))(h) == a => flatMap(f(a))(compose(g, h))
-a => flatMap((b => flatMap(f(b))(g))(a))(h) == a => flatMap(f(a))(b => flatMap(g(b))(h))
+
+a => flatMap((b => flatMap(f(b))(g))(a))(h) ==
+  a => flatMap(f(a))(b => flatMap(g(b))(h))
 ```
 
 So far we have just expanded the definition of `compose`. Equals substituted for equals.
@@ -2468,8 +2487,8 @@ For `Parser`, the `join` combinator is running the outer parser to produce a `Pa
 
 Recall the identity laws:
 
-left identity:  `flatMap(unit(x))(f) == f(x)`
-right identity: `flatMap(x)(unit)    == x`
+* left identity:  `flatMap(unit(x))(f) == f(x)`
+* right identity: `flatMap(x)(unit)    == x`
 
 The left identity law for `Gen`:
 The law states that if you take the values generated by `unit(x)` (which are always `x`) and apply `f` to those values, that's exactly the same as the generator returned by `f(x)`.
@@ -2650,7 +2669,8 @@ def eitherMonad[E]: Monad[({type f[x] = Either[E, x]})#f] =
 def validationApplicative[E]: Applicative[({type f[x] = Validation[E,x]})#f] =
   new Applicative[({type f[x] = Validation[E,x]})#f] {
     def unit[A](a: => A) = Success(a)
-    override def map2[A,B,C](fa: Validation[E,A], fb: Validation[E,B])(f: (A, B) => C) =
+    override def map2[A,B,C](fa: Validation[E,A],
+                             fb: Validation[E,B])(f: (A, B) => C) =
       (fa, fb) match {
         case (Success(a), Success(b)) => Success(f(a, b))
         case (Failure(h1, t1), Failure(h2, t2)) =>
@@ -2667,40 +2687,54 @@ We'll just work through left and right identity, but the basic idea for all thes
 
 Let's start with left and right identity:
 
-    map2(unit(()), fa)((_,a) => a) == fa // Left identity
-    map2(fa, unit(()))((a,_) => a) == fa // Right identity
+``` scala
+map2(unit(()), fa)((_,a) => a) == fa // Left identity
+map2(fa, unit(()))((a,_) => a) == fa // Right identity
+```
 
 We'll do left identity first. We expand definition of `map2`:
 
-    def map2[A,B,C](fa: F[A], fb: F[B])(f: (A,B) => C): F[C]
-      flatMap(fa)(a => map(fb)(b => f(a,b)))
+``` scala
+def map2[A,B,C](fa: F[A], fb: F[B])(f: (A,B) => C): F[C]
+  flatMap(fa)(a => map(fb)(b => f(a,b)))
 
-    flatMap(unit())(u => map(fa)(a => a)) == fa
+flatMap(unit())(u => map(fa)(a => a)) == fa
+```
 
 We just substituted `unit(())` and `(_,a) => a` in for `f`. `map(fa)(a => a)` is just `fa` by the functor laws, giving us:
 
-    flatMap(unit())(u => fa) == fa
+``` scala
+flatMap(unit())(u => fa) == fa
+```
 
 Recall that `flatMap` can be rewritten using `compose`, by using `Unit` as the argument to the first function.
 
-    compose(unit, u => fa)(()) == fa
+``` scala
+compose(unit, u => fa)(()) == fa
+```
 
 And by the monad laws:
 
-    compose(unit, f) == f
+``` scala
+compose(unit, f) == f
+```
 
 Therefore, `compose(unit, u => fa)` simplifies to `u => fa`. And `u` is just `Unit` here, and is ignored, so this is equivalent to `fa`:
 
-    (u => fa)(()) == fa
-    fa == fa
+``` scala
+(u => fa)(()) == fa
+fa == fa
+```
 
 Right identity is symmetric; we just end up using the other identity for `compose`, that `compose(f, unit) == f`.
 
-    flatMap(fa)(a => map(unit(()))(u => a)) == fa
-    flatMap(fa)(a => unit(a)) == fa  // via functor laws
-    compose(u => fa, unit)(()) == fa  
-    (u => fa)(()) == fa
-    fa == fa
+``` scala
+flatMap(fa)(a => map(unit(()))(u => a)) == fa
+flatMap(fa)(a => unit(a)) == fa  // via functor laws
+compose(u => fa, unit)(()) == fa  
+(u => fa)(()) == fa
+fa == fa
+```
 
 Associativity and naturality are left as an exercise.
 
@@ -2761,21 +2795,25 @@ def sequenceMap[K,V](ofa: Map[K,F[V]]): F[Map[K,V]] =
 
 ``` scala
 val listTraverse = new Traverse[List] {
-  override def traverse[G[_],A,B](as: List[A])(f: A => G[B])(implicit G: Applicative[G]): G[List[B]] =
-    as.foldRight(G.unit(List[B]()))((a, fbs) => G.map2(f(a), fbs)(_ :: _))
+  override def traverse[G[_],A,B](as: List[A])(
+    f: A => G[B])(implicit G: Applicative[G]): G[List[B]] =
+      as.foldRight(G.unit(List[B]()))((a, fbs) => G.map2(f(a), fbs)(_ :: _))
 }
 
 val optionTraverse = new Traverse[Option] {
-  override def traverse[G[_],A,B](oa: Option[A])(f: A => G[B])(implicit G: Applicative[G]): G[Option[B]] =
-    oa match {
-      case Some(a) => G.map(f(a))(Some(_))
-      case None    => G.unit(None)
-    }
+  override def traverse[G[_],A,B](oa: Option[A])(
+    f: A => G[B])(implicit G: Applicative[G]): G[Option[B]] =
+      oa match {
+        case Some(a) => G.map(f(a))(Some(_))
+        case None    => G.unit(None)
+      }
 }
 
 val treeTraverse = new Traverse[Tree] {
-  override def traverse[G[_],A,B](ta: Tree[A])(f: A => G[B])(implicit G: Applicative[G]): G[Tree[B]] =
-    G.map2(f(ta.head), listTraverse.traverse(ta.tail)(a => traverse(a)(f)))(Tree(_, _))
+  override def traverse[G[_],A,B](ta: Tree[A])(
+    f: A => G[B])(implicit G: Applicative[G]): G[Tree[B]] =
+      G.map2(f(ta.head),
+             listTraverse.traverse(ta.tail)(a => traverse(a)(f)))(Tree(_, _))
 }
 ```
 
@@ -2846,7 +2884,8 @@ override def foldLeft[A,B](fa: F[A])(z: B)(f: (B, A) => B): B =
 
 ``` scala
 def fuse[G[_],H[_],A,B](fa: F[A])(f: A => G[B], g: A => H[B])
-                       (implicit G: Applicative[G], H: Applicative[H]): (G[F[B]], H[F[B]]) =
+                       (implicit G: Applicative[G],
+                                 H: Applicative[H]): (G[F[B]], H[F[B]]) =
   traverse[({type f[x] = (G[x], H[x])})#f, A, B](fa)(a => (f(a), g(a)))(G product H)
 ```
 
@@ -2976,22 +3015,23 @@ def fill(xs: Map[Int,A]): ST[S,Unit] =
 // An action that does nothing
 def noop[S] = ST[S,Unit](())
 
-def partition[S](a: STArray[S,Int], l: Int, r: Int, pivot: Int): ST[S,Int] = for {
-  vp <- a.read(pivot)
-  _ <- a.swap(pivot, r)
-  j <- STRef(l)
-  _ <- (l until r).foldLeft(noop[S])((s, i) => for {
-    _ <- s
-    vi <- a.read(i)
-    _  <- if (vi < vp) (for {
-      vj <- j.read
-      _  <- a.swap(i, vj)
-      _  <- j.write(vj + 1)
-    } yield ()) else noop[S]
-  } yield ())
-  x <- j.read
-  _ <- a.swap(x, r)
-} yield x
+def partition[S](a: STArray[S,Int], l: Int, r: Int, pivot: Int): ST[S,Int] =
+  for {
+    vp <- a.read(pivot)
+    _ <- a.swap(pivot, r)
+    j <- STRef(l)
+    _ <- (l until r).foldLeft(noop[S])((s, i) => for {
+      _ <- s
+      vi <- a.read(i)
+      _  <- if (vi < vp) (for {
+        vj <- j.read
+        _  <- a.swap(i, vj)
+        _  <- j.write(vj + 1)
+      } yield ()) else noop[S]
+    } yield ())
+    x <- j.read
+    _ <- a.swap(x, r)
+  } yield x
 
 def qs[S](a: STArray[S,Int], l: Int, r: Int): ST[S, Unit] = if (l < r) for {
   pi <- partition(a, l, r, l + (r - l) / 2)
@@ -3242,7 +3282,9 @@ def runLog(implicit F: MonadCatch[F]): F[IndexedSeq[O]] = {
       case Emit(h,t) => go(t, acc :+ h)
       case Halt(End) => F.unit(acc)
       case Halt(err) => F.fail(err)
-      case Await(req,recv) => F.flatMap (F.attempt(req)) { e => go(Try(recv(e)), acc) }
+      case Await(req,recv) => F.flatMap (F.attempt(req)) {
+        e => go(Try(recv(e)), acc)
+      }
     }
   go(this, IndexedSeq())
 }

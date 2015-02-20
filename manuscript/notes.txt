@@ -48,7 +48,7 @@ I'd suggest that when asking for the nth fibonacci number it should be based fro
 def fib(n: Int): Int = {
     @annotation.tailrec
     def loop(n: Int, prev: Int, curr: Int): Int =
-      if (n <= 1) prev   //instead of n == 0. Really n at 0 should be undefined but I'm just returning 0 here...
+      if (n <= 1) prev
       else loop(n-1, curr, prev + curr)
       
     loop(n, 0, 1)
@@ -88,6 +88,7 @@ Yes, this is much more common. There's no need to pollute the namespace with hel
 
 #### Is `a || go(x)` considered a tail call? What about `a && go(x)`?
 Yes
+
 ## Notes on chapter 3: Functional data structures
 
 The Wikipedia article on [algebraic data types](http://en.wikipedia.org/wiki/Algebraic_data_type) has further discussion about the theory behind ADTs.
@@ -364,8 +365,11 @@ Importantly, lenses _compose_. That is, if you have a `Lens[A,B]`, and a `Lens[B
 Lenses are handy to use with the `State` data type. Given a `State[S,A]`. If we're interested in looking at or modifying a portion of the state, and the portion has type `T`, it can be useful to focus on a portion of the state that we're interested in using a `Lens[S,T]`. The getter and setter of a lens can be readily converted to a `State` action:
 
 ```scala
-def getS[S,A](l: Lens[S, A]): State[S,A] = State(s => (l.get(s), s))
-def setS[S,A](l: Lens[S, A], a: A): State[S,Unit] = State(s => (l.set(s, a), ()))
+def getS[S,A](l: Lens[S, A]): State[S,A] =
+  State(s => (l.get(s), s))
+
+def setS[S,A](l: Lens[S, A], a: A): State[S,Unit] =
+  State(s => (l.set(s, a), ()))
 ```
 
 We cannot, however, turn a `State` action into a `Lens`, for the same reason that we cannot convert a Moore machine into a Mealy machine.
@@ -385,6 +389,7 @@ case class State[S,A](run: S => TailRec[(A, S)])
 ```
 
 This is identical to the `State` data type we present in chapter 6, except that the result type of `run` is `TailRec[(S,A)]` instead of just `(S,A)`. See chapter 13 for a thorough discussion of `TailRec`. The important part is that the _result type_ of the `State` transition function needs to be a data type like `TailRec` that gets run at a later time by a tail recursive trampoline function.
+
 ## Notes on chapter 7: Purely functional parallelism
 
 FP has a long history of using combinator libraries for expressing parallelism, and there are a lot of variations of the general idea. The main design choices in this sort of library are around how explicit to make the _forking_ and _joining_ of parallel computations. That is, should the API force the programmer to be fully explicit about when parallel tasks are being forked off into a separate logical thread, or should this be done automatically? And similarly, when waiting for the results of multiple logical threads (say, for the implementation of `map2`), should the order of these joins be something the programmer explicitly specifies or chosen by the framework? 
@@ -501,6 +506,7 @@ def array[A,B](value: Parser[A])(f: List[A] => B): Parser[B] =
 ```
 
 This parses a JSON array, but rather than building a `JArray`, immediately converts the result to `B` using the given function, where `B` might be some more meaningful type. The same strategy can be applied for the rest of the grammar.
+
 ## Notes on chapter 10: Monoids
 
 ### Monoids in category theory
@@ -590,6 +596,7 @@ If `A` and `B` are monoids, then `(A,B)` is a monoid, called their _product_. Bu
 ### Links
 
 [On Monoids, by Rúnar](http://apocalisp.wordpress.com/2010/06/14/on-monoids/) -- Provides some deeper insight on the relationship between monoids and lists, and looks at them from a category theory perspective.
+
 ## Notes on chapter 11: Monads
 
 ### Monad laws through `join`
@@ -704,7 +711,7 @@ A monad `F` can be described by what's called a [_Kleisli category_](http://en.w
 A monad is also a kind of monoid. If we think of a type like `(M, M) => M` as `M² => M` (taking 2 `M`s or the product of `M` with itself), and `M` as `1 => M` (where `1` is the `Unit` type), then we can think of a type like `F[F[A]] => F[A]` as `F²[A] => F[A]` or just `F² ~> F` (where `~>` denotes a [natural transformation](http://en.wikipedia.org/wiki/Natural_transformation)) and `A => F[A]` as `1[A] => F[A]` (where `1` is the identity functor) or just `1 ~> F`:
 
 
-|             | zero/unit | op/join   |
+| type        | zero/unit | op/join   |
 --------------|-----------|-----------|
 | `Monoid[M]` | `1 => M`  | `M² => M` |
 | `Monad[F]`  | `1 ~> F`  | `F² ~> F` |
