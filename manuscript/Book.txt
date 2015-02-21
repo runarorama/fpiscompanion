@@ -1,6 +1,7 @@
 license.txt
-front.txt
-notes.txt
-hints.txt
-answers.txt
-haskell.txt
+front.md
+errata.md
+notes.md
+hints.md
+answers.md
+haskell.md
