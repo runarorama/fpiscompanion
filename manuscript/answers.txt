@@ -3323,8 +3323,6 @@ def eval[F[_],A](a: F[A]): Process[F,A] =
 /* Evaluate the action purely for its effects. */
 def eval_[F[_],A,B](a: F[A]): Process[F,B] =
   eval[F,A](a).drain[B]
-
-
 ```
 
 ### Exercise 15.12
@@ -3334,6 +3332,5 @@ Notice this is the standard monadic `join` combinator!
 ``` scala
 def join[F[_],A](p: Process[F,Process[F,A]]): Process[F,A] =
   p.flatMap(pa => pa)
-
 ```
 

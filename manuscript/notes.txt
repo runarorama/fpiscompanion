@@ -2,7 +2,7 @@
 
 Chapter notes provide historical context, links to further reading, and additional discussion or connections to help tie the material we've covered in the book to the larger practice and research of the FP community. If you're interested, we encourage you to do some Wikipedia surfing and further exploration using some of the content covered here as a branching-off point.
 
-Many of the chapter notes link to resources that use the [Haskell language](http://www.haskell.org). We recommend reading the [brief introduction to Haskell](A-brief-introduction-to-Haskell,-and-why-it-matters), which gives an overview of Haskell for Scala programmers.
+Many of the chapter notes link to resources that use the [Haskell language](http://www.haskell.org). We recommend reading the [brief introduction to Haskell](#hask), which gives an overview of Haskell for Scala programmers.
 
 A more up-to-date version of this content is available on [the FPiS community Wiki.][1]
 
@@ -16,7 +16,7 @@ If you have any questions about the book, or about functional programming in Sca
   * Post your question on [the FPiS community Wiki.][1]
   
   
-[1]: (https://github.com/fpinscala/fpinscala/wiki)
+[1]: https://github.com/fpinscala/fpinscala/wiki
 
 ## Notes on chapter 1: What is functional programming?
 
@@ -42,19 +42,6 @@ We assume in this chapter that you have the Scala compiler and interpreter alrea
 
 We also assume some familiarity with the [factorial function](http://en.wikipedia.org/wiki/Factorial) and we give only a brief explanation of the [Fibonacci sequence](http://en.wikipedia.org/wiki/Fibonacci_number).
 
-I'd suggest that when asking for the nth fibonacci number it should be based from 1, not 0 like the current solution. i.e.
-
-``` scala
-def fib(n: Int): Int = {
-    @annotation.tailrec
-    def loop(n: Int, prev: Int, curr: Int): Int =
-      if (n <= 1) prev
-      else loop(n-1, curr, prev + curr)
-      
-    loop(n, 0, 1)
-  }
-```
-
 ### Lambda calculus ###
 
 The notions of first-class and higher-order functions are formalized by the [lambda calculus](http://en.wikipedia.org/wiki/Lambda_calculus).
@@ -78,15 +65,19 @@ Function composition in functional programming is closely related to [function c
 ### FAQ for chapter 2
 
 #### Are tail calls optimized if the `@annotation.tailrec` annotation isn't there?
+
 They are still optimized, but the compiler won't warn you if it can't do the tail call optimization. 
 
 #### Is there a list of other annotation types somewhere? 
+
 See the [Scaladoc for the Annotation class](http://www.scala-lang.org/api/current/index.html#scala.annotation.Annotation), and expand the 'known subclasses section'. 
 
 #### Is the common style to define loops using local function, rather than a (private) standalone function? 
+
 Yes, this is much more common. There's no need to pollute the namespace with helper functions you aren't expecting to be called by anyone. 
 
 #### Is `a || go(x)` considered a tail call? What about `a && go(x)`?
+
 Yes
 
 ## Notes on chapter 3: Functional data structures
@@ -713,8 +704,8 @@ A monad is also a kind of monoid. If we think of a type like `(M, M) => M` as `M
 
 | type        | zero/unit | op/join   |
 --------------|-----------|-----------|
-| `Monoid[M]` | `1 => M`  | `M² => M` |
-| `Monad[F]`  | `1 ~> F`  | `F² ~> F` |
+| Monoid[M] | 1 => M  | M² => M |
+| Monad[F]  | 1 ~> F  | F² ~> F |
 
 It's now clear that these are the same kind of thing, except `Monoid[M]` is operating in a category where the objects are Scala types and the arrows are Scala functions, and `Monad[F]` is operating in a category where the objects are Scala functors and the arrows are natural transformations.
 
@@ -1187,3 +1178,4 @@ FRP is a deep area within functional programming. Here are just a few links to l
 * With both arrowized and traditional FRP, there are questions about the best way to allow for various forms of context-sensitivity and dynamic switching between signals (sometimes called "dynamic event switching"). The need for this can arise in many situations, but, for instance, it can be used for modeling UIs in which the user can add and remove new UI elements by interacting with existing UI elements on the page. In traditional FRP, use of dynamic event switching can make it easy to introduce _time leaks_, due to accidentally retaining the full history of an `Event`--Heinrich Apfelmus [discusses this issue here](http://apfelmus.nfshost.com/blog/2011/05/15-frp-dynamic-event-switching.html). And in AFRP, since the signals themselves are not first class, it isn't immediately obvious what the best way is to represent and interact with a dynamic, changing set of signals (though this issue has been also addressed in the AFRP line of research, see [Antony Courtney's thesis](http://www.antonycourtney.com/pubs/ac-thesis.pdf) pg 123, also the [Reactive Arcade](http://www.antonycourtney.com/pubs/hw03.pdf) and [FRP, continued](http://haskell.cs.yale.edu/wp-content/uploads/2011/02/workshop-02.pdf) papers).
 
 Over time, the term "FRP" has been somewhat diluted, and the term is sometimes incorrectly used to refer to systems with discrete time, and even decidedly non-functional libraries making use of explicit callbacks and side effects!
+

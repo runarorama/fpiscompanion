@@ -1,4 +1,5 @@
 license.txt
+front.txt
 notes.txt
 hints.txt
 answers.txt

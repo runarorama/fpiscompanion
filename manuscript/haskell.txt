@@ -1,4 +1,4 @@
-# A brief introduction to Haskell, and why it matters
+# A brief introduction to Haskell, and why it matters {#hask}
 
 [Haskell](http://www.haskell.org/haskellwiki/Haskell) is in some ways a nicer language for functional programming than Scala, and if you are serious about learning more FP, we recommend learning it. We recommend this even if you continue to program predominantly in Scala. Why? Many of the key ideas and structures covered in this book (for instance, most of parts 3 and 4) originated with research or work using Haskell. Throughout the chapter notes, we have provided links to further reading--many of those references use Haskell, and knowing Haskell at least well enough to 'read' it will let you tap into the enormous well of ideas about FP that exist in the Haskell community. Our goal here is not to make you a Haskell expert, but to give enough of an introduction to the language that you can learn from the various resources (papers, blog posts, and code) about FP that use Haskell.
 
@@ -16,7 +16,7 @@ We won't talk too much more about Haskell's laziness in this appendix, but follo
 
 Let's start by looking at a simple `"Hello world!"` program, which we might place in a file, `Main.hs`: 
 
-``` Haskell
+``` haskell
 module Main where   -- A comment, starting with `--` 
 
 -- Equivalent to `def main: IO[Unit] = ...`
@@ -44,29 +44,27 @@ Since Haskell is pure, it uses an `IO` type to represent computations that may i
 * `Map[String,Double]` vs `Map String Double`
 * `Map[String,Map[K,V]]` vs `Map String (Map k v)`: In Haskell, type variables must begin with a lowercase letter. Names starting with uppercase are reserved for concrete types and data constructor names. 
 
-***
-__Modules with explicit export lists__: All values and types declared inside a Haskell module are public by default. If you wish to make some of these private, you can declare the module with an explicit _export list_, and simply avoid mentioning any private functions you don't want others to use. For example:
-
-``` Haskell
-module TopSecret (f1, f2) where
-
-f1 :: Int
-f1 = f2 + magicValue
-
-f2 = 97
-magicValue = 42 
-``` 
-
-Since `magicValue` is not exported, it will not be visible to users of this module. See the [Haskell wikibook](http://en.wikibooks.org/wiki/Haskell/Modules#Exporting) for more information about importing and exporting.
-***
-
-
+A> ## Modules with explicit export lists
+A> 
+A> All values and types declared inside a Haskell module are public by default. If you wish to make some of these private, you can declare the module with an explicit _export list_, and simply avoid mentioning any private functions you don't want others to use. For example:
+A> 
+A> ``` haskell
+A> module TopSecret (f1, f2) where
+A> 
+A> f1 :: Int
+A> f1 = f2 + magicValue
+A> 
+A> f2 = 97
+A> magicValue = 42 
+A> ``` 
+A> 
+A> Since `magicValue` is not exported, it will not be visible to users of this module. See the [Haskell wikibook](http://en.wikibooks.org/wiki/Haskell/Modules#Exporting) for more information about importing and exporting.
 
 Type application is left-associative, so `Foo x y z` is the same as `((Foo x) y) z`. Unlike Scala, type constructors in Haskell are _curried_ by default. We do not need to do anything special to partially apply a type constructor, we just leave off some of the arguments (recall the type-lambda trick we introduced in chapter 11 when giving the `Monad` instance for `State`.) We'll see how this comes in handy later, when giving the `Monad` instance for `State`.
 
 Let's look at a couple function definitions: 
 
-``` Haskell
+``` haskell
 factorial :: Int -> Int
 factorial 0 = 1
 factorial n = n * factorial (n-1)
@@ -99,7 +97,7 @@ Lastly, we note that unlike Scala, Haskell does not have a distinction between `
 
 Unlike Scala, algebraic data types in Haskell are not represented using subtypes. Instead, we declare an ADT just by listing its data constructors using the following syntax:
 
-``` Haskell
+``` haskell
 data List a = Nil | Cons a (List a)
 
 data Option a -- alternate style
@@ -125,24 +123,24 @@ headOption (Cons h t) = Some h
 
 Pattern matching forces evaluation of the expression being matched (here, the argument to `headOption`), though the expression is only forced to a depth needed to resolve which branch to take. Thus, `headOption` works fine for an infinite list.
 
-***
-__Haskell record syntax:__ If you want to name the arguments to a data constructor, you can just write functions, for instance (note these are partial functions which generate a pattern match error at runtime if given `Nil`):
-
-``` Haskell
-head (Cons h _) = h 
-tail (Cons _ t) = t 
-``` 
-
-Haskell provides some syntax sugar which generates these functions for you: 
-
-``` Haskell
-data List a = Nil | Cons { head :: a, tail :: List a }
-``` 
-
-This is the same `List` type but the `{ head :: a, tail :: List a }` instructs the compiler to generate the `head` and `tail` accessors. Because this simple scheme puts accessors into the module namespace, you cannot have two data constructors in the same module with a same-named argument. There are various proposals to improve on this.
-
-_Note:_ Haskell does not support ad hoc name overloading like Scala.
-***
+A> ## Haskell record syntax
+A> 
+A> If you want to name the arguments to a data constructor, you can just write functions, for instance (note these are partial functions which generate a pattern match error at runtime if given `Nil`):
+A> 
+A> ``` Haskell
+A> head (Cons h _) = h 
+A> tail (Cons _ t) = t 
+A> ``` 
+A> 
+A> Haskell provides some syntax sugar which generates these functions for you: 
+A> 
+A> ``` Haskell
+A> data List a = Nil | Cons { head :: a, tail :: List a }
+A> ``` 
+A> 
+A> This is the same `List` type but the `{ head :: a, tail :: List a }` instructs the compiler to generate the `head` and `tail` accessors. Because this simple scheme puts accessors into the module namespace, you cannot have two data constructors in the same module with a same-named argument. There are various proposals to improve on this.
+A> 
+A> _Note:_ Haskell does not support ad hoc name overloading like Scala.
 
 Note that the Haskell standard library contains an implementation of `Option`, although the type is called `Maybe`, and its constructors are called `Nothing` and `Just` instead of `None` and `Some`:
 
