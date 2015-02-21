@@ -2,7 +2,7 @@
 
 Chapter notes provide historical context, links to further reading, and additional discussion or connections to help tie the material we've covered in the book to the larger practice and research of the FP community. If you're interested, we encourage you to do some Wikipedia surfing and further exploration using some of the content covered here as a branching-off point.
 
-Many of the chapter notes link to resources that use the [Haskell language](http://www.haskell.org). We recommend reading the [brief introduction to Haskell](#hask), which gives an overview of Haskell for Scala programmers.
+Many of the chapter notes link to resources that use the [Haskell language](http://www.haskell.org). We recommend reading the [*brief introduction to Haskell*](#hask), which gives an overview of Haskell for Scala programmers.
 
 A more up-to-date version of this content is available on [the FPiS community Wiki.][1]
 
@@ -24,7 +24,7 @@ See the Wikipedia articles on [functional programming](http://en.wikipedia.org/w
 
 ### Why functional programming matters 
 
-In this chapter we highlight some of the benefits of functional programming. A classic article that gives some justification for FP is John Hughes's [Why Functional Programming Matters](http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf).
+In this chapter we highlight some of the benefits of functional programming. A classic article that gives some justification for FP is John Hughes's [*Why Functional Programming Matters*](http://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf).
 
 ### Referential transparency and side effects 
 
@@ -32,7 +32,7 @@ We introduce functional programming as programming with _referentially transpare
 
 A subtlety in the definition of RT given in the chapter is the meaning of "without affecting the meaning". What is the _meaning_ of a program? To answer this, we need to consider the program _with regard to_ some evaluator, or in the context of some other program. That is, the meaning of a program depends very much on how we interpret or evaluate it, and whether some effect of evaluation is to be considered a _side_ effect depends on the observer. For example, the fact that memory allocations occur as a side effect of data construction is not something we usually care to track or are even able to observe on the JVM. So ultimately what we consider to break referential transparency depends very much on what we can or care to observe.
 
-See for example [What purity is and isn't](http://blog.higher-order.com/blog/2012/09/13/what-purity-is-and-isnt/) for a discussion of purity with regard to an evaluator, and [Is network I/O always worth tracking?](http://pchiusano.github.io/2014-05-21/what-effects-are-worth-tracking.html) for a more philosophical take on what constitutes a side effect.
+See for example [*What purity is and isn't*](http://blog.higher-order.com/blog/2012/09/13/what-purity-is-and-isnt/) for a discussion of purity with regard to an evaluator, and [*Is network I/O always worth tracking?*](http://pchiusano.github.io/2014-05-21/what-effects-are-worth-tracking.html) for a more philosophical take on what constitutes a side effect.
 
 ## Notes on chapter 2: Getting started
 
@@ -52,7 +52,7 @@ For more on parametric polymorphism, see [the Wikipedia article.](http://en.wiki
 
 ### Parametricity ###
 
-When we can "follow the type" of a function to derive the only possible implementation, we say that the definition is _given by parametricity_. See [the Wikipedia article on parametricity](http://en.wikipedia.org/wiki/Parametricity), and Philip Wadler's paper [Theorems for free!](http://homepages.inf.ed.ac.uk/wadler/topics/parametricity.html)
+When we can "follow the type" of a function to derive the only possible implementation, we say that the definition is _given by parametricity_. See [the Wikipedia article on parametricity](http://en.wikipedia.org/wiki/Parametricity), and Philip Wadler's paper [*Theorems for free!*](http://homepages.inf.ed.ac.uk/wadler/topics/parametricity.html)
 
 ### Curry ###
 
@@ -114,9 +114,9 @@ The "algebraic" in algebraic data types means something specific. This is a refe
 
 See the following links:
 
-* [The Algebra of Algebraic Data Types](http://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/) by Chris Taylor.
-* [Species and Functors and Types, Oh My!](http://www.cis.upenn.edu/~byorgey/papers/species-pearl.pdf) by Brent Yorgey
-* [Clowns to the left of me, jokers to the right](http://personal.cis.strath.ac.uk/~conor/Dissect.pdf) by Conor McBride
+* [*The Algebra of Algebraic Data Types*](http://chris-taylor.github.io/blog/2013/02/10/the-algebra-of-algebraic-data-types/) by Chris Taylor.
+* [*Species and Functors and Types, Oh My!*](http://www.cis.upenn.edu/~byorgey/papers/species-pearl.pdf) by Brent Yorgey
+* [*Clowns to the left of me, jokers to the right*](http://personal.cis.strath.ac.uk/~conor/Dissect.pdf) by Conor McBride
 
 ### Zippers ###
 
@@ -132,11 +132,11 @@ Whereas other programming languages like Haskell or ML may have some species of 
 
 We gain type inference benefits from grouping arguments into two argument lists, as in `xs.foldRight(0)(_ + _)`. Type information flows from the first argument list to the second when inferring type arguments to a function call. Note that no inference benefit can be gained from adding more than two argument lists to a function. When inferring the type arguments to a function call, Scala's typer does not consult any argument lists beyond the first.
 
-See the [Scala Language Specification](http://www.scala-lang.org/docu/files/ScalaReference.pdf) for more information on Scala's type inference. Specifically sections 4.6.4 (Method Return Type Inference), 6.26.4 (Local Type Inference), and 8.3 (Type Parameter Inference In Patterns).
+See the [*Scala Language Specification*](http://www.scala-lang.org/docu/files/ScalaReference.pdf) for more information on Scala's type inference. Specifically sections 4.6.4 (Method Return Type Inference), 6.26.4 (Local Type Inference), and 8.3 (Type Parameter Inference In Patterns).
 ## <a id="s4"/> Links
 
-* [Object-Oriented Programming Versus
-Abstract Data Types](http://www.cs.utexas.edu/users/wcook/papers/OOPvsADT/CookOOPvsADT90.pdf)
+* [*Object-Oriented Programming Versus
+Abstract Data Types*](http://www.cs.utexas.edu/users/wcook/papers/OOPvsADT/CookOOPvsADT90.pdf)
 
 
 ### FAQ for chapter 3
@@ -235,9 +235,9 @@ The chapter explains that when an expression does not terminate, it is said to e
 
 The [Wikipedia article on corecursion](http://en.wikipedia.org/wiki/Corecursion) is a good starting point for understanding the concept.
 
-The article on [Coinduction](http://en.wikipedia.org/wiki/Coinduction) has some further links. Dan Piponi's article ["Data and Codata"](http://blog.sigfpe.com/2007/07/data-and-codata.html) talks about corecursion as "guarded" recursion.
+The article on [Coinduction](http://en.wikipedia.org/wiki/Coinduction) has some further links. Dan Piponi's article [*Data and Codata*](http://blog.sigfpe.com/2007/07/data-and-codata.html) talks about corecursion as "guarded" recursion.
 
-Ralf Hinze's paper ["Reasoning about Codata"](http://www.cs.ox.ac.uk/ralf.hinze/publications/CEFP09.pdf) brings equational reasoning to corecursive programs by employing applicative functors. Hinze's paper will be more comprehensible to readers who have finished part 3 of our book.
+Ralf Hinze's paper [*Reasoning about Codata*](http://www.cs.ox.ac.uk/ralf.hinze/publications/CEFP09.pdf) brings equational reasoning to corecursive programs by employing applicative functors. Hinze's paper will be more comprehensible to readers who have finished part 3 of our book.
 
 ### Tying the knot
 
@@ -371,7 +371,7 @@ See the [Scalaz library's lenses](http://eed3si9n.com/learning-scalaz/Lens.html)
 
 The `State` data type as represented in chapter 6 suffers from a problem with stack overflows for long-running state machines. The problem is that `flatMap` contains a function call that is in tail position, but this tail call is not eliminated on the JVM.
 
-The solution is to use a _trampoline_. Chapter 13 gives a detailed explanation of this technique. See also Rúnar's paper ["Stackless Scala With Free Monads"](http://blog.higher-order.com/assets/trampolines.pdf).
+The solution is to use a _trampoline_. Chapter 13 gives a detailed explanation of this technique. See also Rúnar's paper [*Stackless Scala With Free Monads*](http://blog.higher-order.com/assets/trampolines.pdf).
 
 Using the trampolining data type `TailRec` from chapter 13, a stack-safe `State` data type could be written as follows:
 
@@ -414,7 +414,7 @@ Baking ad hoc optimization rules like this into our data type works, but it can 
 
 ## Notes on chapter 8: Property-based testing
 
-The style of combinator library for testing we developed in this chapter was introduced in a 2000 paper by Koen Claessen and John Hughes, [QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs](http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf) (PDF). In that paper, they presented a Haskell library, called [QuickCheck](http://en.wikipedia.org/wiki/QuickCheck), which became quite popular in the FP world and has inspired similar libraries in other languages, including [ScalaCheck](https://github.com/rickynils/scalacheck/wiki/User-Guide). Many programmers who adopt this style of testing find it to be extraordinarily effective (see, for instance, this [experience report](http://blog.moertel.com/pages/seven-lessons-from-the-icfp-programming-contest) on [Tom Moertel's blog](http://blog.moertel.com/)).
+The style of combinator library for testing we developed in this chapter was introduced in a 2000 paper by Koen Claessen and John Hughes, [*QuickCheck: A Lightweight Tool for Random Testing of Haskell Programs*](http://www.eecs.northwestern.edu/~robby/courses/395-495-2009-fall/quick.pdf) (PDF). In that paper, they presented a Haskell library, called [QuickCheck](http://en.wikipedia.org/wiki/QuickCheck), which became quite popular in the FP world and has inspired similar libraries in other languages, including [ScalaCheck](https://github.com/rickynils/scalacheck/wiki/User-Guide). Many programmers who adopt this style of testing find it to be extraordinarily effective (see, for instance, this [experience report](http://blog.moertel.com/pages/seven-lessons-from-the-icfp-programming-contest) on [Tom Moertel's blog](http://blog.moertel.com/)).
 
 The wikipedia page on [QuickCheck](http://en.wikipedia.org/wiki/QuickCheck) and the [Haskell wiki page](http://www.haskell.org/haskellwiki/Introduction_to_QuickCheck) are good places to start if you're interested in learning more about these sorts of libraries. QuickCheck sparked a number of variations, including the Haskell library [SmallCheck](https://github.com/feuerbach/smallcheck), which is focused on exhaustive enumeration.
 
@@ -431,7 +431,7 @@ forAll(Gen.listOf(Gen.choose(1,10))) { l =>
 
 In this case, the "interpreter" is the `push` method on `ArrayStack`, which modifies the stack in place, and the "instructions" are simply the integers from the input list. But the basic idea can be extended to testing richer interfaces--for instance, we could generate instructions that could either `push` or `pop` elements from an `ArrayStack` (perhaps represented as a `List[Option[Int]]`), and write a property that sequences of `push` and `pop` preserve the invariants of `ArrayStack` (for instance, the final size of the stack should be the number of `push` calls minus the number of `pop` calls). Care must be taken to craft generators that produce valid sequences of instructions (for instance, `pop` without a corresponding prior `push` is not a valid input).
 
-Similar ideas have been used for testing thread safety of concurrent programs. (See [Finding Race Conditions in Erlang with QuickCheck and PULSE](http://www.protest-project.eu/upload/paper/icfp070-claessen.pdf) (PDF)) The key insight here is that thread-safe code does not allow the nondeterminism of thread scheduling to be _observable_. That is, for any _partial order_ of instructions run concurrently, we ought to able to find some single-threaded linear sequence of these instructions with the same observable behavior (this criteria is often called _linearizability_). For instance, if our `ArrayStack` were thread-safe, we would expect that if 2 `push` operations were performed sequentially, followed by two `pop` operations and two `push` operations performed concurrently, this should yield the same result as some deterministic linear sequence of these `push` and `pop` operations). There are some subtleties and interesting questions about how to model this and how to report and minimize failing test cases. In particular, doing it the "obvious" way ends up being intractable due to having to search through a combinatorial number of interleavings to find one that satisfies the observation. The Erlang paper linked above has more details, in particular see section 4. You may be interested to explore how to incorporate these ideas into the library we developed, possibly building on the parallelism library we wrote last chapter. 
+Similar ideas have been used for testing thread safety of concurrent programs. (See [*Finding Race Conditions in Erlang with QuickCheck and PULSE*](http://www.protest-project.eu/upload/paper/icfp070-claessen.pdf) (PDF)) The key insight here is that thread-safe code does not allow the nondeterminism of thread scheduling to be _observable_. That is, for any _partial order_ of instructions run concurrently, we ought to able to find some single-threaded linear sequence of these instructions with the same observable behavior (this criteria is often called _linearizability_). For instance, if our `ArrayStack` were thread-safe, we would expect that if 2 `push` operations were performed sequentially, followed by two `pop` operations and two `push` operations performed concurrently, this should yield the same result as some deterministic linear sequence of these `push` and `pop` operations). There are some subtleties and interesting questions about how to model this and how to report and minimize failing test cases. In particular, doing it the "obvious" way ends up being intractable due to having to search through a combinatorial number of interleavings to find one that satisfies the observation. The Erlang paper linked above has more details, in particular see section 4. You may be interested to explore how to incorporate these ideas into the library we developed, possibly building on the parallelism library we wrote last chapter. 
 
 Lastly, we mention that one design goal of some libraries in this style is to avoid having to _explicitly_ construct generators. The QuickCheck library makes use of a Haskell type class to provide instances of `Gen` "automatically", and this idea has also been borrowed by [ScalaCheck](https://github.com/rickynils/scalacheck/wiki/User-Guide). This can certainly be convenient, especially for simple examples, though we often find that explicit generators are necessary to capture all the interesting constraints on the shape or form of the inputs to a function.
 
@@ -514,7 +514,7 @@ A `Monoid[M]`, then, is just a category where the only object is the type `M`, a
 
 It can be a little difficult to see how the values of a type like `Int` can be _arrows_. Take for instance the monoid formed by integers with addition. Then the integer `5`, say, can be seen as an _operation_ that _adds 5_ to another integer. And `0` can be seen as an operation that leaves an integer alone.
 
-See Rúnar's article [On Monoids](http://apocalisp.wordpress.com/2010/06/14/on-monoids/) for some of the deeper connections.
+See Rúnar's article [*On Monoids*](http://apocalisp.wordpress.com/2010/06/14/on-monoids/) for some of the deeper connections.
 
 ### The canonicity of a Scala monoid
 
@@ -689,7 +689,7 @@ Monoids and monads are connected in various ways in category theory.
 
 The `List` monad can be seen as a theory about monoids. Specifically, the `_.flatten` (monadic `join`) and `List(_)` (monadic `unit`) functions witness that we can add and remove parentheses in a monoid expression. That is, the parenthesization of an expression like `1 + 2 + 3 + 4` doesn't matter. The monad associativity law means that we can remove parentheses in any order we like, and the identity law means we can add them wherever we want.
 
-See [Rúnar's article, "More on monoids and monads"](http://apocalisp.wordpress.com/2010/07/21/more-on-monoids-and-monads/) for more information about this connection.
+See [Rúnar's article, *More on monoids and monads*](http://apocalisp.wordpress.com/2010/07/21/more-on-monoids-and-monads/) for more information about this connection.
 
 #### Kleisli categories
 
