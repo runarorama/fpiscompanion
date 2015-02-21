@@ -1032,15 +1032,20 @@ For further reading on traversable functors, see:
 
 `Traverse[T[_]]` has two laws. There are many ways to state them, but here is one:
 
-##### Identity law
+##### Identity law:
 
-`sequence[Id,A](xs)` = `xs`.
+``` scala
+sequence[Id,A](xs) == xs
+```
 
 That is, traversing in the identity applicative (`type Id[X] = X`) has no effect.
 
-##### Fusion law
+##### Fusion law:
   
-`sequence[({type f[x] = F[G[x]]})#f, A](xs)` = `map(sequence[F,G[A]](xs))(sequence[G,A])`.
+``` scala
+sequence[({type f[x] = F[G[x]]})#f, A](xs) ==
+  map(sequence[F,G[A]](xs))(sequence[G,A])
+```
   
 That is, traversal in `F[_]` followed by traversal in `G[_]` can be fused into one traversal in the composite applicative `F[G[_]]`.
 
