@@ -410,7 +410,7 @@ trait Par[+A] {
 case class MapPar[A,+B](par: Par[A], f: A => B) extends Par[B]
 ```
 
-Baking ad hoc optimization rules like this into our data type works, but it can sometimes get unwieldy, and it's not very modular (we don't get to reuse code if there's some other data type needing similar optimizations). There are various ways of factoring out these sorts of optimizations so our core data type (be it `Par` or some other type) stays clean, and the optimization is handled as a separate concern. Edward Kmett has a nice [blog series discussing this approach](http://comonad.com/reader/2011/free-monads-for-less/). Before embarking on that series you'll need to be familiar with the content in part 3 of this book, and you should read [the Haskell appendix](https://github.com/pchiusano/fpinscala/wiki/A-brief-introduction-to-Haskell,-and-why-it-matters) as well.
+Baking ad hoc optimization rules like this into our data type works, but it can sometimes get unwieldy, and it's not very modular (we don't get to reuse code if there's some other data type needing similar optimizations). There are various ways of factoring out these sorts of optimizations so our core data type (be it `Par` or some other type) stays clean, and the optimization is handled as a separate concern. Edward Kmett has a nice [blog series discussing this approach](http://comonad.com/reader/2011/free-monads-for-less/). Before embarking on that series you'll need to be familiar with the content in part 3 of this book, and you should read [the Haskell appendix](#hask) as well.
 
 ## Notes on chapter 8: Property-based testing
 
