@@ -133,10 +133,10 @@ Whereas other programming languages like Haskell or ML may have some species of 
 We gain type inference benefits from grouping arguments into two argument lists, as in `xs.foldRight(0)(_ + _)`. Type information flows from the first argument list to the second when inferring type arguments to a function call. Note that no inference benefit can be gained from adding more than two argument lists to a function. When inferring the type arguments to a function call, Scala's typer does not consult any argument lists beyond the first.
 
 See the [*Scala Language Specification*](http://www.scala-lang.org/docu/files/ScalaReference.pdf) for more information on Scala's type inference. Specifically sections 4.6.4 (Method Return Type Inference), 6.26.4 (Local Type Inference), and 8.3 (Type Parameter Inference In Patterns).
-## <a id="s4"/> Links
 
-* [*Object-Oriented Programming Versus
-Abstract Data Types*](http://www.cs.utexas.edu/users/wcook/papers/OOPvsADT/CookOOPvsADT90.pdf)
+### Links
+
+* [*Object-Oriented Programming Versus Abstract Data Types*](http://www.cs.utexas.edu/users/wcook/papers/OOPvsADT/CookOOPvsADT90.pdf)
 
 
 ### FAQ for chapter 3
@@ -223,7 +223,7 @@ In Scala, non-strict arguments are sometimes called "by name" arguments, in refe
 ``` scala
 def pairIf[A](b: Boolean, x: => A) = {
   lazy val y = x
-  if (b) (y, y)
+  if (b) Some((y, y)) else None
 }
 ```
 
