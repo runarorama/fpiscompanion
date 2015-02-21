@@ -1712,15 +1712,15 @@ Keep reading for a discussion
 
 ### Exercise 9.13
 
-There is a completed reference implementation of `Parsers` in `parsing/instances/Reference.scala`, though we recommend you continue reading before looking at that, since we're still refining the representation.
+There is a completed reference implementation of `Parsers` in [parsing/instances/Reference.scala](https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala), though we recommend you continue reading before looking at that, since we're still refining the representation.
 
 ### Exercise 9.14
 
-Again, see `parsing/instances/Reference.scala` for a fully worked implementation.
+Again, see `Reference.scala` for a fully worked implementation.
 
 ### Exercise 9.15
 
-Again see reference implementation here: https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/parsing/instances/Reference.scala
+Again see the reference implementation.
 
 ### Exercise 9.16
 
