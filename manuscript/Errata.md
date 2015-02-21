@@ -1,4 +1,4 @@
-## Errata
+# Errata
 
 This is a list of post-publication errata for the first published version of *Functional Programming in Scala*. To submit new errata please [open an issue](https://github.com/fpinscala/fpinscala/issues) in the book's GitHub repository.
 
