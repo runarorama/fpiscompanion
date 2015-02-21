@@ -266,7 +266,7 @@ Be careful using Stream.apply, both in the standard library and in the exercises
 
 ```scala
 Stream({println("One"); 1}, {println("Two"); 2}, {println("Three"); 3})
-``` 
+```
 
 will immediately print One, Two, Three. Although the Stream will be constructed lazily, the contents have already been evaluated. 
 
@@ -702,10 +702,10 @@ A monad `F` can be described by what's called a [_Kleisli category_](http://en.w
 A monad is also a kind of monoid. If we think of a type like `(M, M) => M` as `M² => M` (taking 2 `M`s or the product of `M` with itself), and `M` as `1 => M` (where `1` is the `Unit` type), then we can think of a type like `F[F[A]] => F[A]` as `F²[A] => F[A]` or just `F² ~> F` (where `~>` denotes a [natural transformation](http://en.wikipedia.org/wiki/Natural_transformation)) and `A => F[A]` as `1[A] => F[A]` (where `1` is the identity functor) or just `1 ~> F`:
 
 {width="narrow"}
-|type      |zero      |op        |
------------|----------|----------|
-|Monoid M  |1 => M    |M² => M   |
-|Monad  F  |1 ~> F    |F² ~> F   |
+|type        |zero      |op        |
+|------------|----------|----------|
+|`Monoid[M]` |`1 => M`  |`M² => M` |
+|`Monad[F]`  |`1 ~> F`  |`F² ~> F` |
 
 It's now clear that these are the same kind of thing, except `Monoid[M]` is operating in a category where the objects are Scala types and the arrows are Scala functions, and `Monad[F]` is operating in a category where the objects are Scala functors and the arrows are natural transformations.
 
