@@ -348,6 +348,20 @@ def zipWith[A,B,C](a: List[A], b: List[B])(f: (A,B) => C): List[C] =
 
 ### Exercise 3.24
 
+It's good to specify some properties about these functions.
+For example, do you expect these expressions to be true?
+
+``` scala
+(xs append ys) startsWith xs
+
+xs startsWith Nil
+
+(xs append ys append zs) hasSubsequence ys
+
+xs hasSubsequence Nil
+```
+
+Here is one solution where those properties do in fact hold.
 There's nothing particularly bad about this implementation,
 except that it's somewhat monolithic and easy to get wrong.
 Where possible, we prefer to assemble functions like this using
@@ -367,8 +381,8 @@ def startsWith[A](l: List[A], prefix: List[A]): Boolean = (l,prefix) match {
 }
 @annotation.tailrec
 def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = sup match {
-  case Nil => false
-  case _ if startsWith(sup, sub) => true
+  case Nil => sub == Nil
+  case _ => startsWith(sup, sub)
   case Cons(h,t) => hasSubsequence(t, sub)
 }
 ```
@@ -726,7 +740,7 @@ def headOption: Option[A] =
 def map[B](f: A => B): Stream[B] =
   foldRight(empty[B])((h,t) => cons(f(h), t)) 
 
-def filter[B](f: A => Boolean): Stream[A] =
+def filter(f: A => Boolean): Stream[A] =
   foldRight(empty[A])((h,t) => 
     if (f(h)) cons(h, t)
     else t) 
@@ -1187,7 +1201,6 @@ case class Map2Future[A,B,C](a: Future[A], b: Future[B],
 ``` scala
 def asyncF[A,B](f: A => B): A => Par[B] =
   a => lazyUnit(f(a))
-
 ```
 
 ### Exercise 7.05
@@ -2785,10 +2798,10 @@ Here all you have is `f`, which returns an `F[G[B]]`. For it to have the appropr
 
 ``` scala
 def sequenceMap[K,V](ofa: Map[K,F[V]]): F[Map[K,V]] =
-    (ofa foldLeft unit(Map.empty[K,V])) { case (acc, (k, fv)) =>
+  (ofa foldLeft unit(Map.empty[K,V])) {
+    case (acc, (k, fv)) =>
       map2(acc, fv)((m, v) => m + (k -> v))
-    }
-
+  }
 ```
 
 ### Exercise 12.13

@@ -92,6 +92,18 @@ Again, try using `foldRight`!
 
 You should be able to use a combination of existing functions.
 
+### Exercise 3.24
+
+It's good to specify some properties about your implementation up front. For example, do you expect these expressions to be true?
+
+``` scala
+(xs append ys append zs) hasSubsequence ys
+
+xs hasSubsequence Nil
+```
+
+You will find that the answer to one of these implies something about the other.
+
 ### Exercise 3.28
 
 The signature is `def map[A,B](t: Tree[A])(f: A => B): Tree[B]`.
@@ -120,7 +132,19 @@ The `map2` function that we wrote earlier for `Option` will follow the same patt
 
 ### Exercise 4.07
 
-The signature of `traverse` is `def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]]`, and the signature of `sequence` is `def sequence[E,A](es: List[Either[E, A]]): Either[E, List[A]]`. In your implementation, you can pattern-match the list and use explicit recursion or use `foldRight` to perform the recursion for you.
+The signature of `traverse` is 
+
+``` scala
+def traverse[E,A,B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]]
+```
+
+And the signature of `sequence` is:
+
+``` scala
+def sequence[E,A](es: List[Either[E, A]]): Either[E, List[A]]
+```
+
+In your implementation, you can pattern-match the list and use explicit recursion or use `foldRight` to perform the recursion for you.
 
 ## Hints for exercises in chapter 5
 
@@ -135,6 +159,18 @@ Use `foldRight`.
 ### Exercise 5.06
 
 Let `None: Option[A]` be the first argument to `foldRight`. Follow the types from there.
+
+### Exercise 5.09
+
+The example function `ones` is recursive. How could you define `from` recursively?
+
+### Exercise 5.10
+
+Chapter two discussed writing loops functionally, using a recursive helper function. How would that apply here?
+
+### Exercise 5.11
+
+Review the techniques you used in exercise 4.1 for working with `Option`.
 
 ### Exercise 5.14
 
@@ -248,17 +284,13 @@ Try mapping over the result of `product`.
 
 Multiplication of numbers is associative, `a * (b * c) == (a * b) * c`. Is there an analogous property for parsers? What can you say about the relationship between `map` and `product`?
 
-
-
 ### Exercise 9.06
 
 Given a string of digits, `s`, you can use `s.toInt` to convert that to an `Int`.
 
-
 ### Exercise 9.07
 
 Use `flatMap` and `succeed`.
-
 
 ### Exercise 9.09
 
@@ -314,19 +346,17 @@ Think about what a partial answer looks like. If we've only seen some of the ele
 
 ### Exercise 10.09
 
-Try creating a data type which tracks the _interval_ of the values in a given segment, as well as whether an 'unordered segment' has been found.
-When merging the values for two segments, think about how these two pieces of information should be updated.
+Try creating a data type which tracks the _interval_ of the values in a given segment, as well as whether an "unordered segment" has been found.
 
+When merging the values for two segments, think about how these two pieces of information should be updated.
 
 ### Exercise 10.10
 
 A `Stub` should never contain any whitespace.
 
-
 ### Exercise 10.11
 
 You can write default implementations on the `Foldable` trait an then `override` them as necessary.
-
 
 ### Exercise 10.18
 
@@ -366,8 +396,11 @@ Look at the signature of `compose`. What happens if `A` is `Unit`?
 
 You want to show that these two are equivalent:
 
+``` scala
 flatMap(flatMap(x)(f))(g) == flatMap(x)(a => flatMap(f(a))(g))
+
 compose(compose(f, g), h) == compose(f, compose(g, h))
+```
 
 Rewrite one in terms of the other.
 
