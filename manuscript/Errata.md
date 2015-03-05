@@ -8,6 +8,8 @@ _Pg 7_: In `throw new Exception`, `Exception` should not be bolded, in the code 
 
 _Pg 10_: URL in footnote is incorrectly listed as https://github.com/pchiusano/fpinscala, should be https://github.com/fpinscala/fpinscala
 
+_Pg 19_: Parenthetical phrase in footnote is missing a closing parenthesis.
+
 _Pg 55_: `employeesByName.get("Joe")` should be `lookupByName("Joe")` at the top of the page.
 
 _Pg 82_: `Int.MaxValue` is incorrectly capitalized as `Int.maxValue` in the exercise prompt for `6.1`
